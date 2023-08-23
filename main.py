@@ -10,8 +10,7 @@ def parse_stl(file):
     index_space = text.find(" ")
     first_n = text.find("\n")
     name = text[index_space + 1:first_n]
-    triangles = text.split("facet normal")
-    triangles = triangles[1:]
+    triangles = text.split("facet normal")[1:]
     triangles_array = np.array([])
     for id, triangle in enumerate(triangles):
         t = triangle.split("\n")
@@ -31,7 +30,10 @@ def parse_stl(file):
             triangles_array = vertex_array
         else:
             triangles_array = np.vstack([triangles_array, vertex_array])
-    logger.debug(triangles_array)
+    return triangles_array, name
 
 
-parse_stl(file)
+triangles, name = parse_stl(file)
+logger.debug(f"{len(triangles)} треугольников")
+logger.debug(triangles)
+logger.debug(name)
