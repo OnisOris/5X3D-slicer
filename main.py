@@ -1,7 +1,7 @@
 import numpy as np
 from loguru import logger
 
-path = "./cube.stl"
+path = "mainHolder.stl"
 file = open(path, "r")
 
 
@@ -26,14 +26,44 @@ def parse_stl(file):
             coordinates = coordinates.astype(float)
             vertex_array = np.vstack([vertex_array, coordinates])
         vertex_array = np.array([vertex_array])
+
         if id == 0:
             triangles_array = vertex_array
         else:
             triangles_array = np.vstack([triangles_array, vertex_array])
     return triangles_array, name
 
+def show(triangles):
+    x = np.array([])
+    y = np.array([])
+    z = np.array([])
+    for id, matrix in enumerate(triangles):
+
+        if id == 0:
+            x = np.array(matrix[:, 0])
+            y = np.array(matrix[:, 1])
+            z = np.array(matrix[:, 2])
+
+            x = np.hstack([x, x[1]])[1:]
+            y = np.hstack([y, y[1]])[1:]
+            z = np.hstack([z, z[1]])[1:]
+
+
+        else:
+            x = np.hstack([x, np.hstack([np.array(matrix[:, 0]), np.array(matrix[:, 0])[1]])[1:]])
+            y = np.hstack([y, np.hstack([np.array(matrix[:, 1]), np.array(matrix[:, 1])[1]])[1:]])
+            z = np.hstack([z, np.hstack([np.array(matrix[:, 2]), np.array(matrix[:, 2])[1]])[1:]])
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    figure = ax.plot(x, y, z, c='r')
+    plt.show()
 
 triangles, name = parse_stl(file)
 logger.debug(f"{len(triangles)} треугольников")
-logger.debug(triangles)
+logger.debug(triangles[0])
 logger.debug(name)
+
+from mpl_toolkits.mplot3d import axes3d
+import matplotlib.pyplot as plt
+
+show(triangles)
