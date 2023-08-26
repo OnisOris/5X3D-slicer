@@ -1,5 +1,7 @@
 import numpy as np
 from loguru import logger
+from mpl_toolkits.mplot3d import axes3d
+import matplotlib.pyplot as plt
 
 path = "mainHolder.stl"
 file = open(path, "r")
@@ -33,13 +35,14 @@ def parse_stl(file):
             triangles_array = np.vstack([triangles_array, vertex_array])
     return triangles_array, name
 
+
 def show(triangles):
     x = np.array([])
     y = np.array([])
     z = np.array([])
-    for id, matrix in enumerate(triangles):
+    for i, matrix in enumerate(triangles):
 
-        if id == 0:
+        if i == 0:
             x = np.array(matrix[:, 0])
             y = np.array(matrix[:, 1])
             z = np.array(matrix[:, 2])
@@ -47,7 +50,6 @@ def show(triangles):
             x = np.hstack([x, x[1]])[1:]
             y = np.hstack([y, y[1]])[1:]
             z = np.hstack([z, z[1]])[1:]
-
 
         else:
             x = np.hstack([x, np.hstack([np.array(matrix[:, 0]), np.array(matrix[:, 0])[1]])[1:]])
@@ -58,12 +60,9 @@ def show(triangles):
     figure = ax.plot(x, y, z, c='r')
     plt.show()
 
+
 triangles, name = parse_stl(file)
 logger.debug(f"{len(triangles)} треугольников")
 logger.debug(triangles[0])
 logger.debug(name)
-
-from mpl_toolkits.mplot3d import axes3d
-import matplotlib.pyplot as plt
-
 show(triangles)
