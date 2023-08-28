@@ -1,9 +1,10 @@
 import numpy as np
 from loguru import logger
-from mpl_toolkits.mplot3d import axes3d
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from plane import Plane
 
-path = "mainHolder.stl"
+path = "cube.stl"
 file = open(path, "r")
 
 
@@ -59,6 +60,10 @@ def show(triangles):
     ax = fig.add_subplot(projection='3d')
     figure = ax.plot(x, y, z, c='r')
     plt.show()
+    # fig = plt.figure(figsize=(7, 4))
+    # ax_3d = Axes3D(fig)
+    # ax_3d.plot_wireframe(x, y, z)
+    # ax_3d.plot_surface(x, y, z)
 
 
 triangles, name = parse_stl(file)
@@ -66,3 +71,9 @@ logger.debug(f"{len(triangles)} треугольников")
 logger.debug(triangles[0])
 logger.debug(name)
 show(triangles)
+
+plane = Plane()
+# m = np.linalg.inv(triangles[0][1:4])
+# logger.debug(m)
+#logger.debug(triangles[0][1:4])
+plane.crete_plane3(triangles[0][1:4])
