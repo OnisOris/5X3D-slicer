@@ -67,13 +67,13 @@ def show(triangles):
 
 
 triangles, name = parse_stl(file)
-logger.debug(f"{len(triangles)} треугольников")
-logger.debug(triangles[0])
-logger.debug(name)
+#logger.debug(f"{len(triangles)} треугольников")
+#logger.debug(triangles[0])
+#logger.debug(name)
 show(triangles)
 
 plane = Plane()
 # m = np.linalg.inv(triangles[0][1:4])
 # logger.debug(m)
-#logger.debug(triangles[0][1:4])
+logger.debug(triangles[0][1:4])
 plane.crete_plane3(triangles[0][1:4])

@@ -14,13 +14,14 @@ class Plane:
         G = np.array([[-1], [-1], [-1]])
         logger.debug(np.linalg.inv(matrix))
         abc = np.dot(np.linalg.inv(matrix), G)
-        self.coefficients = np.array([abc[0], abc[1], abc[2], 1])
-        # logger.debug(abc)
+        logger.debug(abc.T[0])
+        self.coefficients = np.array([abc.T[0][0], abc.T[0][1], abc.T[0][2], 1])
+        logger.debug(self.coefficients)
         return abc
 
     def show(self):
-        hight = 2
-        lenth = 2
+        hight = 2  # Высота прямоугольника
+        lenth = 2  # Длина прямоугольника
 
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
