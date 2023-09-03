@@ -14,8 +14,15 @@ class Line:
     # point1 = [x1, y1, z1]
     def line_create_from_points(self, point1, point2):
         # hello world!
-        self.a = -point1[0]
-        self.b = -point1[1]
-        self.c = -point1[2]
+        self.a = - point1[0]
+        self.b = - point1[1]
+        self.c = - point1[2]
+        self.p1 = point2[0] - point1[0]
+        self.p2 = point2[1] - point1[1]
+        self.p3 = point2[2] - point1[2]
+
+
+# class LineSegment(Line):
+#     def __init__(self, point_a, point_b):
 
 
