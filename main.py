@@ -12,6 +12,10 @@ triangles, name = parser.parse_stl(file)
 parser.show(triangles)
 plane = Plane(1, 1, 1, 0)
 plane.show()
+
+A = np.array([[2, 2, 2],
+              [1, 1, 1]])
+logger.debug(np.linalg.inv(A))
 # logger.debug(triangles[0][1:4])
 # plane.crete_plane3(triangles[0][1:4])
 
