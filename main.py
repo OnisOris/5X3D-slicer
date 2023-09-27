@@ -1,7 +1,7 @@
 import numpy as np
 from loguru import logger
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
+# import matplotlib.pyplot as plt
 from plane import Plane
 from parser_stl import Parser_stl
 

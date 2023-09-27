@@ -1,7 +1,7 @@
 import numpy as np
 from loguru import logger
 import matplotlib.pyplot as plt
-
+from line import Line
 
 class Plane:
     # coefficients - коэффициенты уравнения плоскости a, b, c, d
@@ -88,3 +88,13 @@ class Plane:
         for element in vector:
             entry_point = np.vstack([entry_point, element])
         return entry_point
+
+# взять любое решение из системы уравнений двух плоскостей (взять какую-нибудь координату равной например 1,
+    # только проверить перпендикулярность векторов нормали плоскостей к оси, координату которой мы берем за ноль)
+    def line_from_planes(self, plane1, plane2):
+        p1 = plane1.b * plane2.c - plane2.b*plane1.c
+        p2 = plane1.c * plane2.a - plane2.c * plane1.a
+        p3 = plane1.a * plane2.b - plane2.a * plane1.b
+        # как найти точку с прямой?
+        line = Line(0, 0, 0, p1, p2, p3)
+        return line
