@@ -5,13 +5,14 @@ from loguru import logger
 from line import Line
 from plane import Plane
 from parser_stl import Parser_stl
-from threeDTool import point_from_plane_line_intersection
+from threeDTool import point_from_plane_line_intersection, max_min_points
 
-path = "mainHolder.stl"
+path = "sphere.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
 parser.show(triangles)
+print(triangles[:][1].T[0][1:4])
 plane = Plane(45, 2, 1, 78)
 plane.show()
 
@@ -23,6 +24,9 @@ point = point_from_plane_line_intersection(line, plane)
 
 logger.debug(point)
 
+max, min = max_min_points(triangles)
+logger.debug(max)
+logger.debug(min)
 # A = np.array([[2, 2, 2],
 #               [1, 1, 1]])
 # logger.debug(np.linalg.inv(A))
@@ -54,3 +58,6 @@ logger.debug(point)
 # ax.set_aspect('equal')
 #
 # plt.show()
+# a = np.array([0, 1])
+# b = np.append(a, a)
+# logger.debug(b)
