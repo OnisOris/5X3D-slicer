@@ -7,26 +7,34 @@ from plane import Plane
 from parser_stl import Parser_stl
 from threeDTool import point_from_plane_line_intersection, max_min_points
 
-path = "sphere.stl"
+path = "cube.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
 parser.show(triangles)
 print(triangles[:][1].T[0][1:4])
-plane = Plane(45, 2, 1, 78)
-plane.show()
+plane = Plane(1, 0, 0, 0)
+# plane.show()
+plane2 = Plane(0, 1, 0, 0)
+
+line = Line()
+line.line_from_planes(plane, plane2)
+line.info()
+
+print(line.a, line.b, line.c, line.p1, line.p2, line.p3)
 
 #tool = ThreeDTool()
-line = Line()
-line.line_create_from_points([0, 0, 0], [1, 4, 5])
+# line = Line()
+# line.line_create_from_points([0, 0, 0], [1, 4, 5])
+#
+# point = point_from_plane_line_intersection(line, plane)
+#
+# logger.debug(point)
 
-point = point_from_plane_line_intersection(line, plane)
+# max, min = max_min_points(triangles)
+# logger.debug(max)
+# logger.debug(min)
 
-logger.debug(point)
-
-max, min = max_min_points(triangles)
-logger.debug(max)
-logger.debug(min)
 # A = np.array([[2, 2, 2],
 #               [1, 1, 1]])
 # logger.debug(np.linalg.inv(A))
