@@ -128,23 +128,41 @@ class Line:
 
             # # Если не параллельны, то:
             # z = 0
-            val1 = plane1.a * plane2.b - plane2.a * plane1.b
+            val1_1 = plane1.a * plane2.b - plane2.a * plane1.b
+            val1_2 = plane2.a*plane1.b-plane1.a*plane2.b
             # y = 0
-            val2 = plane2.c * plane1.a - plane1.c * plane2.c
+            val2_1 = plane2.c * plane1.a - plane1.c * plane2.a
+            val2_2 = plane2.a * plane1.c - plane1.a * plane2.c
             # x = 0
-            val3 = plane2.c * plane1.b - plane1.c * plane2.b
-            if val1 != 0:
+            val3_1 = plane2.c * plane1.b - plane1.c * plane2.b
+            val3_2 = plane2.c * plane1.b - plane1.c * plane2.b
+            if val1_1 != 0 and plane2.b != 0:
                 self.__c = 0
-                self.__a = (plane2.d*plane1.b-plane1.d*plane2.b)/val1
+                self.__a = (plane2.d*plane1.b-plane1.d*plane2.b)/val1_1
                 self.__b = - (plane2.a*self.__a+plane2.d)/plane2.b
-            elif val2 != 0:
+            if val1_1 != 0 and plane2.b == 0:
+                self.__c = 0
+                self.__b = (plane1.a*plane2.d-plane1.d*plane2.a)/val1_2
+                self.__a = - (plane2.b*self.__c+plane2.d)/plane2.a
+
+            elif val2_1 != 0 and plane2.c != 0:
                 self.__b = 0
-                self.__a = (plane2.d*plane1.c-plane1.d*plane2.c)/val2
+                self.__a = (plane2.d*plane1.c-plane1.d*plane2.c)/val2_1
                 self.__c = -(plane2.a*self.__a+plane2.d)/plane2.c
-            elif val3 !=0:
+
+            elif val2_2 != 0 and plane2.a != 0:
+                self.__b = 0
+                self.__c = (plane1.a*plane2.d-plane2.a*plane1.d)/val2_2
+                self.__a = -(plane2.c*self.__c+plane2.d)/plane2.a
+
+            elif val3_1 != 0 and plane2.c != 0:
                 self.__a = 0
-                self.__b = (plane1.c*plane2.d-plane1.d*plane2.c)/val3
+                self.__b = (plane1.c*plane2.d-plane1.d*plane2.c)/val3_1
                 self.__c = -(plane2.b*self.__b+plane2.d)/plane2.c
+            elif val3_2 != 0 and plane2.b != 0:
+                self.__a = 0
+                self.__c = (plane2.b*plane1.d-plane2.d*plane1.b)/val3_2
+                self.__b = -(plane2.c*self.__c+plane2.d)/plane2.b
             else:
                 logger.debug("Zero Error")
         else:

@@ -11,6 +11,7 @@ def point_from_plane_line_intersection(line: Line, plane: Plane):
     z = t + line.c
     return np.array([x, y, z])
 
+
 def max_min_points(triangles):
     '''
     Функция принимает массив из координат треугольников и возвращает минимальные максимальные точки x, y, z в виде
@@ -29,6 +30,12 @@ def max_min_points(triangles):
     max = [np.max(x), np.max(y), np.max(z)]
     min = [np.min(x), np.min(y), np.min(z)]
     return max, min
+
+def slice(triangles):
+
+    max_min_points = max_min_points(triangles)
+    plane_array = np.array([])
+
 class ThreeDTool:
     def __init__(self):
         self.d = 0
