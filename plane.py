@@ -94,6 +94,7 @@ class Plane:
     ################### ->
     # lenth          x
     def show(self):
+        # TODO: при параллельности плоскости оси z все ломается, нужно поменять способ отображения
         hight = 20  # Высота прямоугольника
         lenth = 20 # Длина прямоугольника
         # x = [lenth, -lenth]
@@ -101,23 +102,40 @@ class Plane:
         # z = [self.projection_z()]
         x1 = -lenth / 2
         y1 = hight / 2
-        point1 = np.array([x1, y1, self.projection_z(x1, y1)])
+        z1 = self.projection_z(x1, y1)
+        if z1 == "Uncertainty z":
+            z1 = hight/2
+        point1 = np.array([x1, y1, z1])
         x2 = lenth / 2
         y2 = hight / 2
-        point2 = np.array([x2, y2, self.projection_z(x2, y2)])
+        z2 = self.projection_z(x2, y2)
+        if z2 == "Uncertainty z":
+            z2 = hight/2
+        point2 = np.array([x2, y2, z2])
         x3 = lenth / 2
         y3 = -hight / 2
-        point3 = np.array([x3, y3, self.projection_z(x3, y3)])
+        z3 = self.projection_z(x3, y3)
+        if z3 == "Uncertainty z":
+            z3 = -hight/2
+        point3 = np.array([x3, y3, z3])
         x4 = -lenth / 2
         y4 = -hight / 2
-        point4 = np.array([x4, y4, self.projection_z(x4, y4)])
+        z4 = self.projection_z(x4, y4)
+        if z4 == "Uncertainty z":
+            z4 = -hight/2
+        point4 = np.array([x4, y4, z4])
 
         matrix_x_y_z = self.full_vstack([point1, point2, point3, point4, point1]).T
+        logger.debug(matrix_x_y_z)
         points = np.array([[x1, y1, 0], [x2, y2, 0], [x3, y3, 0], [x4, y4, 0], [x1, y1, 0]])
         matrix_points = self.full_vstack(points).T
         logger.debug(matrix_x_y_z)
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
+        ax.set_xlabel("X", fontsize=15, color='red')
+        ax.set_ylabel("Y", fontsize=15, color='green')
+        ax.set_zlabel("Z", fontsize=15, color='blue')
+
         figure = ax.plot(matrix_x_y_z[0], matrix_x_y_z[1], matrix_x_y_z[2], c='r')
         figure2 = ax.plot(matrix_points[0], matrix_points[1], matrix_points[2], c='g')
 
@@ -134,21 +152,82 @@ class Plane:
         plt.show()
 
     def projection_z(self, point_x, point_y):
-        if self.__c == 0:
-            return Exception
-        point_z = (-self.__a * point_x - self.__b * point_y - self.__d) / self.__c
-        return point_z
+
+        """
+        Данная функция берет координаты плоскости x и y, и по ним ищет точку z на плоскости класса Plane.
+        Рассмотрено четыре случая:
+        1) c и b = 0, тогда плоскость параллельна осям z и y, а x = const, поэтому для нахождения x достаточно взять
+        точку O(x, 0, 0), тогда x = -D/A
+        2) c и a = 0, тогда плоскость параллельна осям z и x, а y = const, поэтому для нахождения y достаточно взять
+        точку O(0, y, 0), тогда y = -D/B
+        3) Только c = 0, тогда точка z на плоскости может быть любой в координатах x, y.
+        Поэтому ее можно задать вручную.
+        4) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
+        :param point_x:
+        :param point_y:
+        :return: Point z or "Uncertainty"
+        """
+
+        if self.__c == 0 and self.__b == 0:
+            return -self.__d/self.__a
+        elif self.__c == 0 and self.__a == 0:
+            return -self.__d/self.__b
+        elif self.__c == 0:
+            return "Uncertainty z"
+        else:
+            point_z = (-self.__a * point_x - self.__b * point_y - self.__d) / self.__c
+            return point_z
 
     def projection_y(self, point_x, point_z):
-        if self.__b == 0:
-            return Exception
+
+        """
+        Данная функция берет координаты плоскости x и z, и по ним ищет точку y на плоскости класса Plane.
+        Рассмотрено четыре случая:
+        1) b и c = 0, тогда плоскость параллельна осям z и y, а x = const, поэтому для нахождения x достаточно взять
+        точку O(x, 0, 0), тогда x = -D/A
+        2) b и a = 0, тогда плоскость параллельна осям y и x, а z = const, поэтому для нахождения z достаточно взять
+        точку O(0, 0, z), тогда z = -D/C
+        3) Только b = 0, тогда точка y на плоскости может быть любой в координатах x, z.
+        Поэтому ее можно задать вручную.
+        4) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
+        :param point_x:
+        :param point_z:
+        :return: Point y or "Uncertainty"
+        """
+
+        if self.__b == 0 and self.__c == 0:
+            return -self.__d/self.__a
+        elif self.__b == 0 and self.__a == 0:
+            return -self.__d/self.__c
+        elif self.__b == 0:
+            return "Uncertainty y"
         point_y = (-self.__a * point_x - self.__c * point_z - self.__d) / self.__b
         return point_y
 
-    def projection_x(self, point_x, point_y):
-        if self.__a == 0:
-            return Exception
-        point_x = (-self.__a * point_x - self.__b * point_y - self.__d) / self.__a
+    def projection_x(self, point_y, point_z):
+
+        """
+        Данная функция берет координаты плоскости x и z, и по ним ищет точку y на плоскости класса Plane.
+        Рассмотрено четыре случая:
+        1) a и c = 0, тогда плоскость параллельна осям x и z, а x = const, поэтому для нахождения x достаточно взять
+        точку O(x, 0, 0), тогда x = -D/B
+        2) a и b = 0, тогда плоскость параллельна осям x и y, а z = const, поэтому для нахождения z достаточно взять
+        точку O(0, 0, z), тогда z = -D/C
+        3) Только a = 0, тогда точка y на плоскости может быть любой в координатах y, z.
+        Поэтому ее можно задать вручную.
+        4) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
+        :param point_y:
+        :param point_z:
+        :return: Point x or "Uncertainty"
+        """
+
+        if self.__a == 0 and self.__c == 0:
+            return -self.__d/self.__b
+        elif self.__a == 0 and self.__b == 0:
+            return -self.__d/self.__c
+        elif self.__a == 0:
+            return "Uncertainty x"
+        point_x = (-self.__b * point_y - self.__c * point_z - self.__d) / self.__a
         return point_x
 
     def full_vstack(self, vector):

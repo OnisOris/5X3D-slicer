@@ -5,7 +5,7 @@ from loguru import logger
 from line import Line
 from plane import Plane
 from parser_stl import Parser_stl
-from threeDTool import point_from_plane_line_intersection, max_min_points
+from threeDTool import ThreeDTool
 
 path = "cube.stl"
 file = open(path, "r")
@@ -13,16 +13,20 @@ parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
 parser.show(triangles)
 print(triangles[:][1].T[0][1:4])
-plane = Plane(0, 0, 1, 2)
-plane.show()
-plane2 = Plane(0, 1, 0, 0)
-
+plane = Plane(0, 1, 0, 0)
+# plane.show()
+plane2 = Plane(2, 1, 1, 10)
+plane2.show()
 line = Line()
 line.line_from_planes(plane, plane2)
 line.info()
 
 print(line.a, line.b, line.c, line.p1, line.p2, line.p3)
 
+tool = ThreeDTool()
+line_z = Line(15, 0, 0, 0, 0, 1)
+
+logger.debug(tool.point_from_plane_line_intersection(line_z, plane2))
 #tool = ThreeDTool()
 # line = Line()
 # line.line_create_from_points([0, 0, 0], [1, 4, 5])
