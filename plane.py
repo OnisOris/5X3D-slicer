@@ -155,25 +155,20 @@ class Plane:
 
         """
         Данная функция берет координаты плоскости x и y, и по ним ищет точку z на плоскости класса Plane.
-        Рассмотрено четыре случая:
-        1) c и b = 0, тогда плоскость параллельна осям z и y, а x = const, поэтому для нахождения x достаточно взять
-        точку O(x, 0, 0), тогда x = -D/A
-        2) c и a = 0, тогда плоскость параллельна осям z и x, а y = const, поэтому для нахождения y достаточно взять
-        точку O(0, y, 0), тогда y = -D/B
-        3) Только c = 0, тогда точка z на плоскости может быть любой в координатах x, y.
+        Рассмотрено три случая:
+        1) Только c = 0, тогда точка z на плоскости может быть любой в координатах x, y.
         Поэтому ее можно задать вручную.
-        4) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
+        2) b и a = 0, тогда плоскость параллельна осям y и x, а z = const, поэтому для нахождения z достаточно взять
+        точку O(0, 0, z), тогда z = -D/C
+        3) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
         :param point_x:
         :param point_y:
         :return: Point z or "Uncertainty"
         """
-
-        if self.__c == 0 and self.__b == 0:
-            return -self.__d/self.__a
-        elif self.__c == 0 and self.__a == 0:
-            return -self.__d/self.__b
-        elif self.__c == 0:
+        if self.__c == 0:
             return "Uncertainty z"
+        elif self.__b == 0 and self.__a == 0:
+            return -self.__d/self.__c
         else:
             point_z = (-self.__a * point_x - self.__b * point_y - self.__d) / self.__c
             return point_z
@@ -182,53 +177,45 @@ class Plane:
 
         """
         Данная функция берет координаты плоскости x и z, и по ним ищет точку y на плоскости класса Plane.
-        Рассмотрено четыре случая:
-        1) b и c = 0, тогда плоскость параллельна осям z и y, а x = const, поэтому для нахождения x достаточно взять
-        точку O(x, 0, 0), тогда x = -D/A
-        2) b и a = 0, тогда плоскость параллельна осям y и x, а z = const, поэтому для нахождения z достаточно взять
-        точку O(0, 0, z), тогда z = -D/C
-        3) Только b = 0, тогда точка y на плоскости может быть любой в координатах x, z.
+        Рассмотрено три случая:
+        1) Только b = 0, тогда точка y на плоскости может быть любой в координатах x, z.
         Поэтому ее можно задать вручную.
-        4) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
+        2) c и a = 0, тогда плоскость параллельна осям z и x, а y = const, поэтому для нахождения y достаточно взять
+        точку O(0, y, 0), тогда y = -D/B
+        3) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
         :param point_x:
         :param point_z:
         :return: Point y or "Uncertainty"
         """
-
-        if self.__b == 0 and self.__c == 0:
-            return -self.__d/self.__a
-        elif self.__b == 0 and self.__a == 0:
-            return -self.__d/self.__c
-        elif self.__b == 0:
+        if self.__b == 0:
             return "Uncertainty y"
-        point_y = (-self.__a * point_x - self.__c * point_z - self.__d) / self.__b
+        elif self.__a == 0 and self.__c == 0:
+            return -self.__d/self.__b
+        else:
+            point_y = (-self.__a * point_x - self.__c * point_z - self.__d) / self.__b
         return point_y
 
     def projection_x(self, point_y, point_z):
 
         """
         Данная функция берет координаты плоскости x и z, и по ним ищет точку y на плоскости класса Plane.
-        Рассмотрено четыре случая:
-        1) a и c = 0, тогда плоскость параллельна осям x и z, а x = const, поэтому для нахождения x достаточно взять
-        точку O(x, 0, 0), тогда x = -D/B
-        2) a и b = 0, тогда плоскость параллельна осям x и y, а z = const, поэтому для нахождения z достаточно взять
-        точку O(0, 0, z), тогда z = -D/C
-        3) Только a = 0, тогда точка y на плоскости может быть любой в координатах y, z.
+        Рассмотрено три случая:
+        1) Только a = 0, тогда точка y на плоскости может быть любой в координатах y, z.
         Поэтому ее можно задать вручную.
-        4) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
+        2) a и c = 0, тогда плоскость параллельна осям x и z, а x = const, поэтому для нахождения x достаточно взять
+        точку O(x, 0, 0), тогда x = -D/B
+        3) Нормальный вариант, когда ни один из коэффициентов не равен нулю.
         :param point_y:
         :param point_z:
         :return: Point x or "Uncertainty"
         """
-
-        if self.__a == 0 and self.__c == 0:
-            return -self.__d/self.__b
-        elif self.__a == 0 and self.__b == 0:
-            return -self.__d/self.__c
-        elif self.__a == 0:
+        if self.__a == 0:
             return "Uncertainty x"
-        point_x = (-self.__b * point_y - self.__c * point_z - self.__d) / self.__a
-        return point_x
+        elif self.__b == 0 and self.__c == 0:
+            return -self.__d/self.__a
+        else:
+            point_x = (-self.__b * point_y - self.__c * point_z - self.__d) / self.__a
+            return point_x
 
     def full_vstack(self, vector):
         entry_point = vector[0]
@@ -236,17 +223,3 @@ class Plane:
             entry_point = np.vstack([entry_point, element])
         return entry_point
 
-    # взять любое решение из системы уравнений двух плоскостей (взять какую-нибудь координату равной например 1,
-    # только проверить перпендикулярность векторов нормали плоскостей к оси, координату которой мы берем за ноль)
-    # def line_from_planes(self, plane1, plane2):
-    #     p1 = plane1.b * plane2.c - plane2.b * plane1.c
-    #     p2 = plane1.c * plane2.a - plane2.c * plane1.a
-    #     p3 = plane1.a * plane2.b - plane2.a * plane1.b
-    #     # как найти точку с прямой?
-    #     # Если векто
-    #     z = 0
-    #     x = (plane1.b*plane2.b)*(plane2.d-plane1.d)/(plane1.a*plane2.b-plane2.a*plane1.b)
-    #     y = -(plane2.a*plane1.b*(plane2.d-plane1.d)/(plane1.a*plane2.b-plane2.a*plane1.b))
-    #     line = Line(x, y, z, p1, p2, p3)
-    #     # TODO: реализовать варианты, когда две плоскости параллельны оси z
-    #     return line
