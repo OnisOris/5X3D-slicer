@@ -76,9 +76,9 @@ class Line:
         :param point2: [x2, y2, z2]
         :return: None
         '''
-        self.__a = - point1[0]
-        self.__b = - point1[1]
-        self.__c = - point1[2]
+        self.__a = point1[0]
+        self.__b = point1[1]
+        self.__c = point1[2]
         # TODO: проверка на нуль
         p1 = point2[0] - point1[0]
         p2 = point2[1] - point1[1]
@@ -109,7 +109,7 @@ class Line:
         logger.debug(f"{p1} {p2} {p3}")
         # Сначала проверяем не параллельны ли эти две плоскости:
 
-        if p1 != 0 or p2 != 0 or p3 != 0:
+        if p1 != 0 and p2 != 0 and p3 != 0:
             mod_p = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
             if mod_p != 1.0 and mod_p != 0:
                 p1 = p1 / mod_p
