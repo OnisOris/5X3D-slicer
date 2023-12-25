@@ -142,7 +142,7 @@ class Line:
                 self.__c = 0
                 self.__a = (plane2.d * plane1.b - plane1.d * plane2.b) / val1_1
                 self.__b = - (plane2.a * self.__a + plane2.d) / plane2.b
-            if val1_1 != 0 and plane2.b == 0:
+            if val1_2 != 0 and plane2.b == 0:
                 self.__c = 0
                 self.__b = (plane1.a * plane2.d - plane1.d * plane2.a) / val1_2
                 self.__a = - (plane2.b * self.__c + plane2.d) / plane2.a
