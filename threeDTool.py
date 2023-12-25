@@ -30,6 +30,16 @@ class ThreeDTool:
             logger.debug("Прямая параллельная плоскости")
             return None
 
+    def point_from_line_line_intersection(self, line1: Line, line2: Line):
+        # проверка на параллельность прямых
+        var = np.dot([line1.p1, line1.p2, line1.p3], [line2.p1, line2.p2, line2.p3])
+        # TODO: Сделать проверку на нахождение прямых в одной плоскости и их совпадение
+        if var != 1:
+            x = (line1.p1*line2.a-line1.a*line2.p1)/(line1.p1-line2.p1)
+            y = (line1.p2*line2.b-line1.b*line2.p2)/(line1.p2-line2.p2)
+            z = (line1.p3 * line2.c - line1.c * line2.p3)/(line1.p3 - line2.p3)
+            return np.array([x, y, z])
+
     def max_min_points(self, triangles):
         """
         Функция принимает массив из координат треугольников и возвращает минимальные максимальные точки x, y, z в виде
@@ -57,13 +67,17 @@ class ThreeDTool:
         amount_of_layers = hight/thiсk
         plane_array = np.array([])
         slice_plane = Plane(0, 0, 1, -z_min)
+        points = []
         # for i in range(round(amount_of_layers)):
         for triangle in triangles:
             position_index = self.position_analyze_of_triangle(triangle, slice_plane)
             if position_index == 2:
+                # Создаем плоскость треугольника
                 plane = Plane(triangle)
+                # Создаем линию пересечения плоскостей треугольника и плоскости слайсинга
                 line = Line()
                 line.line_from_planes(plane, slice_plane)
+                # Линии из вершин треугольников
                 line1_2 = Line()
                 line1_2.line_create_from_points(triangle[1], triangle[2])
 
@@ -72,6 +86,15 @@ class ThreeDTool:
 
                 line3_1 = Line()
                 line3_1.line_create_from_points(triangle[3], triangle[1])
+
+                point1 = self.point_from_line_line_intersection(line, line1_2)
+                point2 = self.point_from_line_line_intersection(line, line2_3)
+                point3 = self.point_from_line_line_intersection(line, line3_1)
+                points.append(point1)
+                points.append(point2)
+                points.append(point3)
+        logger.debug(points)
+
 
 
 

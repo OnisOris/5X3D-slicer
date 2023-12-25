@@ -4,8 +4,10 @@ import matplotlib.pyplot as plt
 from line import Line
 from math import sqrt
 
+
 class Plane:
-    # coefficients - коэффициенты уравнения плоскости a, b, c, d
+    # Коэффициенты уравнения плоскости a, b, c, d вида
+    # ax + by + cz + d = 0
     def __init__(self, a=0, b=0, c=1, d=0):
         self.__a = a
         self.__b = b
@@ -44,6 +46,7 @@ class Plane:
     @property
     def c(self):
         return self.__c
+
     @property
     def d(self):
         return self.__d
@@ -59,6 +62,7 @@ class Plane:
     @c.setter
     def c(self, c):
         self.__c = c
+
     @d.setter
     def d(self, d):
         self.__d = d
@@ -78,7 +82,7 @@ class Plane:
         :return: None
         """
         vector_N = triangle[0]
-        mod = sqrt(vector_N[0]**2+vector_N[1]**2+vector_N[2]**2)
+        mod = sqrt(vector_N[0] ** 2 + vector_N[1] ** 2 + vector_N[2] ** 2)
         # Из-за неточного экспорта в STL и вычислений в Python модуль не будет точно равен 1,
         # но должен быть примерно равен 1
         if mod <= 0.998 or mod >= 1:
@@ -86,8 +90,7 @@ class Plane:
         first_point = triangle[point]
         self.__a, self.__b, self.__c = vector_N[0], vector_N[1], vector_N[2]
         #  Вычисление коэффициента D
-        self.__d = self.__a*first_point[0] - self.__b*first_point[1] - self.__c*first_point[2]
-
+        self.__d = self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
 
     ###################
     #       0         # hight
@@ -96,7 +99,7 @@ class Plane:
     def show(self):
         # TODO: при параллельности плоскости оси z все ломается, нужно поменять способ отображения
         hight = 20  # Высота прямоугольника
-        lenth = 20 # Длина прямоугольника
+        lenth = 20  # Длина прямоугольника
         # x = [lenth, -lenth]
         # y = [hight, -hight]
         # z = [self.projection_z()]
@@ -104,25 +107,25 @@ class Plane:
         y1 = hight / 2
         z1 = self.projection_z(x1, y1)
         if z1 == "Uncertainty z":
-            z1 = hight/2
+            z1 = hight / 2
         point1 = np.array([x1, y1, z1])
         x2 = lenth / 2
         y2 = hight / 2
         z2 = self.projection_z(x2, y2)
         if z2 == "Uncertainty z":
-            z2 = hight/2
+            z2 = hight / 2
         point2 = np.array([x2, y2, z2])
         x3 = lenth / 2
         y3 = -hight / 2
         z3 = self.projection_z(x3, y3)
         if z3 == "Uncertainty z":
-            z3 = -hight/2
+            z3 = -hight / 2
         point3 = np.array([x3, y3, z3])
         x4 = -lenth / 2
         y4 = -hight / 2
         z4 = self.projection_z(x4, y4)
         if z4 == "Uncertainty z":
-            z4 = -hight/2
+            z4 = -hight / 2
         point4 = np.array([x4, y4, z4])
 
         matrix_x_y_z = self.full_vstack([point1, point2, point3, point4, point1]).T
@@ -143,7 +146,7 @@ class Plane:
                                 [points[1], point2],
                                 [points[2], point3],
                                 [points[3], point4]])
-        #logger.debug(points_proj)
+        # logger.debug(points_proj)
         figures = []
         for i in range(4):
             figures.append(ax.plot(points_proj[i].T[0], points_proj[i].T[1], points_proj[i].T[2], c='b'))
@@ -168,7 +171,7 @@ class Plane:
         if self.__c == 0:
             return "Uncertainty z"
         elif self.__b == 0 and self.__a == 0:
-            return -self.__d/self.__c
+            return -self.__d / self.__c
         else:
             point_z = (-self.__a * point_x - self.__b * point_y - self.__d) / self.__c
             return point_z
@@ -190,7 +193,7 @@ class Plane:
         if self.__b == 0:
             return "Uncertainty y"
         elif self.__a == 0 and self.__c == 0:
-            return -self.__d/self.__b
+            return -self.__d / self.__b
         else:
             point_y = (-self.__a * point_x - self.__c * point_z - self.__d) / self.__b
         return point_y
@@ -212,7 +215,7 @@ class Plane:
         if self.__a == 0:
             return "Uncertainty x"
         elif self.__b == 0 and self.__c == 0:
-            return -self.__d/self.__a
+            return -self.__d / self.__a
         else:
             point_x = (-self.__b * point_y - self.__c * point_z - self.__d) / self.__a
             return point_x
@@ -222,4 +225,3 @@ class Plane:
         for element in vector:
             entry_point = np.vstack([entry_point, element])
         return entry_point
-
