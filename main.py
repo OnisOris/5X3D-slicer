@@ -2,67 +2,75 @@ import numpy as np
 from loguru import logger
 # from mpl_toolkits.mplot3d import Axes3D
 # import matplotlib.pyplot as plt
-from line import Line
+from line import Line, Line_segment
 from plane import Plane
 from parser_stl import Parser_stl
 from threeDTool import ThreeDTool
 
-path = "sphere.stl"
-file = open(path, "r")
-parser = Parser_stl()
-triangles, name = parser.parse_stl(file)
-print(name)
-parser.show(triangles)
-print(triangles[:][1].T[0][1:4])
-plane = Plane(0, 1, 0, 0)
-# plane.show()
-plane2 = Plane(2, 1, 1, 10)
-plane2.show()
-line = Line()
-line.line_from_planes(plane, plane2)
-line.info()
+seg = Line_segment(y2=2, z2=1)
 
-print(line.a, line.b, line.c, line.p1, line.p2, line.p3)
-
-tool = ThreeDTool()
-line_z = Line(15, 0, 0, 0, 0, 1)
-
-logger.debug(tool.point_from_plane_line_intersection(line_z, plane2))
-tool.slice(triangles)
-import matplotlib.pyplot as plt
-
-import numpy as np
+print(seg.lenth)
 
 
-def makeData ():
-    ra = 2
-    # Строим сетку в интервале от -10 до 10, имеющую 100 отсчетов по обоим координатам
-    x = np.linspace(-1, 1, ra)
-    y = np.linspace(-1, 1, ra)
-
-    # Создаем двумерную матрицу-сетку
-    xgrid, ygrid = np.meshgrid(x, y)
-
-    # В узлах рассчитываем значение функции
-    z = np.ones((ra, ra))
-
-    return xgrid, ygrid, z
 
 
-if __name__ == '__main__':
-    triangle = np.array([[0, 1, 0], [1, 1, 1], [1, 1, 0], [0, 1, 1]])
-    x, y, z = makeData()
 
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.set_xlabel("X", fontsize=15, color='red')
-    ax.set_ylabel("Y", fontsize=15, color='green')
-    ax.set_zlabel("Z", fontsize=15, color='blue')
-    po = np.array([[1, -1], [1, -1]])
-    # !!!
-    ax.plot_surface(x, y, z)
-
-    plt.show()
+# path = "sphere.stl"
+# file = open(path, "r")
+# parser = Parser_stl()
+# triangles, name = parser.parse_stl(file)
+# print(name)
+# parser.show(triangles)
+# print(triangles[:][1].T[0][1:4])
+# plane = Plane(0, 1, 0, 0)
+# # plane.show()
+# plane2 = Plane(2, 1, 1, 10)
+# plane2.show()
+# line = Line()
+# line.line_from_planes(plane, plane2)
+# line.info()
+#
+# print(line.a, line.b, line.c, line.p1, line.p2, line.p3)
+#
+# tool = ThreeDTool()
+# line_z = Line(15, 0, 0, 0, 0, 1)
+#
+# logger.debug(tool.point_from_plane_line_intersection(line_z, plane2))
+# tool.slice(triangles)
+# import matplotlib.pyplot as plt
+#
+# import numpy as np
+#
+#
+# def makeData ():
+#     ra = 2
+#     # Строим сетку в интервале от -10 до 10, имеющую 100 отсчетов по обоим координатам
+#     x = np.linspace(-1, 1, ra)
+#     y = np.linspace(-1, 1, ra)
+#
+#     # Создаем двумерную матрицу-сетку
+#     xgrid, ygrid = np.meshgrid(x, y)
+#
+#     # В узлах рассчитываем значение функции
+#     z = np.ones((ra, ra))
+#
+#     return xgrid, ygrid, z
+#
+#
+# if __name__ == '__main__':
+#     triangle = np.array([[0, 1, 0], [1, 1, 1], [1, 1, 0], [0, 1, 1]])
+#     x, y, z = makeData()
+#
+#     fig = plt.figure()
+#     ax = fig.add_subplot(projection='3d')
+#     ax.set_xlabel("X", fontsize=15, color='red')
+#     ax.set_ylabel("Y", fontsize=15, color='green')
+#     ax.set_zlabel("Z", fontsize=15, color='blue')
+#     po = np.array([[1, -1], [1, -1]])
+#     # !!!
+#     ax.plot_surface(x, y, z)
+#
+#     plt.show()
 
 
 

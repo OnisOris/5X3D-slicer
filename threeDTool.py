@@ -2,6 +2,8 @@ from plane import Plane
 from line import Line
 import numpy as np
 from loguru import logger
+from math import sqrt
+
 
 class ThreeDTool:
     def __init__(self):
@@ -22,9 +24,9 @@ class ThreeDTool:
             t = -(plane.a * line.a + plane.b * line.b + plane.c * line.c + plane.d) / (
                     plane.a * line.p1 + plane.b * line.p2 + plane.c * line.p3)
             logger.debug(t)
-            x = t*line.p1 + line.a
-            y = t*line.p2 + line.b
-            z = t*line.p3 + line.c
+            x = t * line.p1 + line.a
+            y = t * line.p2 + line.b
+            z = t * line.p3 + line.c
             return np.array([x, y, z])
         else:
             logger.debug("Прямая параллельная плоскости")
@@ -35,9 +37,9 @@ class ThreeDTool:
         var = np.dot([line1.p1, line1.p2, line1.p3], [line2.p1, line2.p2, line2.p3])
         # TODO: Сделать проверку на нахождение прямых в одной плоскости и их совпадение
         if var != 1:
-            x = (line1.p1*line2.a-line1.a*line2.p1)/(line1.p1-line2.p1)
-            y = (line1.p2*line2.b-line1.b*line2.p2)/(line1.p2-line2.p2)
-            z = (line1.p3 * line2.c - line1.c * line2.p3)/(line1.p3 - line2.p3)
+            x = (line1.p1 * line2.a - line1.a * line2.p1) / (line1.p1 - line2.p1)
+            y = (line1.p2 * line2.b - line1.b * line2.p2) / (line1.p2 - line2.p2)
+            z = (line1.p3 * line2.c - line1.c * line2.p3) / (line1.p3 - line2.p3)
             return np.array([x, y, z])
 
     def max_min_points(self, triangles):
@@ -64,7 +66,7 @@ class ThreeDTool:
         z_min = min_xyz[2]
         z_max = max_xyz[2]
         hight = self.distance_between_two_points(z_min, z_max)
-        amount_of_layers = hight/thiсk
+        amount_of_layers = hight / thiсk
         plane_array = np.array([])
         slice_plane = Plane(0, 0, 1, -z_min)
         points = []
@@ -95,10 +97,6 @@ class ThreeDTool:
                 points.append(point3)
         logger.debug(points)
 
-
-
-
-
     def position_analyze_of_triangle(self, triangle, plane: Plane) -> int:
         """
         Функция принимает массив треугольников 4x3, где строка 1 - вектор нормали, строки 2-4 - это координаты вершин
@@ -127,7 +125,6 @@ class ThreeDTool:
         else:
             return 2
 
-
     def position_analyzer_of_point(self, point, plane: Plane) -> int:
         """
         Функция принимает точку в виде списка [x, y, z] и плоскость класса Plane. Функция говорит, по какую сторону от
@@ -147,7 +144,6 @@ class ThreeDTool:
         else:
             return 0
 
-
     def distance_between_two_points(self, point1, point2) -> float:
         """
         Данная функция берет две точки с прямой (одномерное пространство) и возвращает расстояние между ними.
@@ -163,3 +159,6 @@ class ThreeDTool:
             return float(array[1] - array[0])
         else:
             return float(abs(array[0]) - abs(array[1]))
+
+
+

@@ -170,6 +170,11 @@ class Line:
         else:
             logger.debug("Плоскости не пересекаются и либо параллельны, либо совпадают")
 
+
 #         Если параллельны, то z = -D/C (d и c от параллельной плоскости)
-# class LineSegment(Line):
-#     def __init__(self, point_a, point_b):
+class Line_segment(Line):
+    def __init__(self, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0):
+        super().__init__()
+        self.point1 = [x1, y1, z1]
+        self.point2 = [x2, y2, z2]
+        self.lenth = sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
