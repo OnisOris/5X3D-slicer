@@ -13,12 +13,13 @@ from threeDTool import *
 # TODO: сделать проверку перпендикулярности нормали к треугольнику, если вектор не перпендикулярен, то все ломается
 tri = [[1, 1, 0], [5, 2, -6], [3, 4, 5]]
 tr = Triangle(tri)
-print(tr.normal)
+logger.debug(tr.triangle_array())
+# print(tr.normal)
 # logger.debug(tr.a)
 # logger.debug(tr.b)
 # logger.debug(tr.c)
 # logger.debug(tr.d)
-logger.debug(tr.a*5+tr.b*2+tr.c*(-6)+tr.d)
+# logger.debug(tr.a*5+tr.b*2+tr.c*(-6)+tr.d)
 
 
 
