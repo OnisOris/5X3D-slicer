@@ -89,6 +89,7 @@ def position_analyze_of_triangle(triangle, plane) -> int:
     1 - треугольник находится перед плоскостью (куда смотрит нормаль плоскости);
     0 - треугольник лежит в плоскости;
     -1 - треугольник лежит за плоскостью (в противоположную сторону от направления нормали).
+    -2 - только одна вершина треугольника лежит в плоскости
     :param triangle:
     :param plane:
     :return: 2, 1, 0, -1
@@ -105,6 +106,10 @@ def position_analyze_of_triangle(triangle, plane) -> int:
         return -1
     elif var1 == 0 and var2 == 0 and var3 == 0:
         return 0
+    elif var1 == 0 and var2 == 1 and var3 == 1 or var1 == 0 and var2 == -1 and var3 == -1\
+            or var1 == 1 and var2 == 0 and var3 == 1 or var1 == -1 and var2 == 0 and var3 == -1\
+            or var1 == 1 and var2 == 1 and var3 == 0 or var1 == -1 and var2 == -1 and var3 == 0:
+        return -2
     else:
         return 2
 
