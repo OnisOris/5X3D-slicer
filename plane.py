@@ -5,6 +5,9 @@ from line import Line
 from math import sqrt
 
 
+from vectorTool import normal_of_triangle
+
+
 class Plane:
     # Коэффициенты уравнения плоскости a, b, c, d вида
     # ax + by + cz + d = 0
@@ -85,12 +88,13 @@ class Plane:
         mod = sqrt(vector_N[0] ** 2 + vector_N[1] ** 2 + vector_N[2] ** 2)
         # Из-за неточного экспорта в STL и вычислений в Python модуль не будет точно равен 1,
         # но должен быть примерно равен 1
-        if mod <= 0.998 or mod >= 1:
+        logger.debug(mod)
+        if mod < 0.998 or mod > 1:
             logger.warning("Модуль вектора vector_N меньше 0.998 или больше 1")
         first_point = triangle[point]
         self.__a, self.__b, self.__c = vector_N[0], vector_N[1], vector_N[2]
         #  Вычисление коэффициента D
-        self.__d = self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
+        self.__d = - self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
 
     ###################
     #       0         # hight
@@ -225,3 +229,14 @@ class Plane:
         for element in vector:
             entry_point = np.vstack([entry_point, element])
         return entry_point
+
+
+class Triangle(Plane):
+    def __init__(self, vertex1, vertex2, vertex3):
+        super().__init__()
+        self.vertex1 = np.array(vertex1)
+        self.vertex2 = np.array(vertex2)
+        self.vertex3 = np.array(vertex3)
+        self.normal = normal_of_triangle(vertex1, vertex2, vertex3)
+        logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+        self.create_plane_from_triangle(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))

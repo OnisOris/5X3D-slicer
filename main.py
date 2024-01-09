@@ -3,13 +3,20 @@ from loguru import logger
 # from mpl_toolkits.mplot3d import Axes3D
 # import matplotlib.pyplot as plt
 from line import Line, Line_segment
-from plane import Plane
+from plane import Plane, Triangle
 from parser_stl import Parser_stl
-from threeDTool import ThreeDTool
+from vectorTool import *
 
-seg = Line_segment(y2=2, z2=1)
-
-print(seg.lenth)
+# seg = Line_segment(y2=2, z2=1)
+#
+# print(seg.lenth)
+tr = Triangle([1, 5, 8], [1, 1, 0], [5, 2, -6])
+print(tr.normal)
+logger.debug(tr.a)
+logger.debug(tr.b)
+logger.debug(tr.c)
+logger.debug(tr.d)
+logger.debug(tr.a*1+tr.b*5+tr.c*8+tr.d)
 
 
 
