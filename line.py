@@ -2,6 +2,7 @@ from math import sqrt
 from loguru import logger
 from threeDTool import *
 
+
 class Line:
     # Уравнение вида:
     # (x-a)/p1 = (y-b)/p2 = (z-c)/p3
@@ -170,6 +171,14 @@ class Line:
         else:
             logger.debug("Плоскости не пересекаются и либо параллельны, либо совпадают")
 
+    def point_belongs_to_the_line(self, point):
+        eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
+        eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
+        if eq1 == 0 and eq2 == 0:
+            return True
+        else:
+            return False
+
 
 #         Если параллельны, то z = -D/C (d и c от параллельной плоскости)
 class Line_segment(Line):
@@ -179,10 +188,19 @@ class Line_segment(Line):
         self.point2 = [x2, y2, z2]
         self.lenth = sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
-
-    # def lsftp(self, triangle, plane):
-    #     '''
-    #      Line segment from triangle and plane или сокращенно lsftp
-    #     :return:
-    #     '''
-    # position_analyze_of_triangle()
+    def lsftp(self, triangle, plane):
+        '''
+         Line segment from triangle and plane или сокращенно lsftp
+        :return:
+        '''
+        pat = position_analyze_of_triangle(triangle.triangle_array())
+        # if pat == 2:
+        #     point1 = point_from_plane_line_intersection()
+    # def point_belongs_to_the_segment(self, point):
+    #     eq1 = self.p2*self.p3*(point[0]-self.a) - self.p1*self.p3*(point[1]-self.b)
+    #     eq2 = self.p1*self.p3*(point[1]-self.b) - self.p1*self.p2*(point[2]-self.c)
+    #     if eq1 == 0 and eq2 == 0:
+    #
+    #         return True
+    #     else:
+    #         return False
