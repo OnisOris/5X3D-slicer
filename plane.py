@@ -3,9 +3,7 @@ from loguru import logger
 import matplotlib.pyplot as plt
 from line import Line
 from math import sqrt
-
-
-from vectorTool import normal_of_triangle
+from threeDTool import *
 
 
 class Plane:
@@ -88,13 +86,19 @@ class Plane:
         mod = sqrt(vector_N[0] ** 2 + vector_N[1] ** 2 + vector_N[2] ** 2)
         # Из-за неточного экспорта в STL и вычислений в Python модуль не будет точно равен 1,
         # но должен быть примерно равен 1
-        logger.debug(mod)
-        if mod < 0.998 or mod > 1:
-            logger.warning("Модуль вектора vector_N меньше 0.998 или больше 1")
+        # logger.debug(mod)
+        if mod != 1:
+            a, b, c = vector_N[0]/mod, vector_N[1]/mod, vector_N[2]/mod
+        else:
+            a, b, c = vector_N[0], vector_N[1], vector_N[2]
         first_point = triangle[point]
-        self.__a, self.__b, self.__c = vector_N[0], vector_N[1], vector_N[2]
+        self.__a, self.__b, self.__c = a, b, c
         #  Вычисление коэффициента D
         self.__d = - self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
+        # logger.debug(np.linalg.norm([a, b, c]))
+        # if mod < 0.998 or mod > 1:
+        #     logger.warning("Модуль вектора vector_N меньше 0.998 или больше 1")
+
 
     ###################
     #       0         # hight
@@ -232,11 +236,22 @@ class Plane:
 
 
 class Triangle(Plane):
-    def __init__(self, vertex1, vertex2, vertex3):
+    def __init__(self, vertexes):
         super().__init__()
-        self.vertex1 = np.array(vertex1)
-        self.vertex2 = np.array(vertex2)
-        self.vertex3 = np.array(vertex3)
-        self.normal = normal_of_triangle(vertex1, vertex2, vertex3)
-        logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
-        self.create_plane_from_triangle(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+        logger.debug(np.shape(vertexes))
+        if np.shape(vertexes)[0] == 3:
+            self.vertex1 = np.array(vertexes[0])
+            self.vertex2 = np.array(vertexes[1])
+            self.vertex3 = np.array(vertexes[2])
+            self.normal = normal_of_triangle(self.vertex1, self.vertex2, self.vertex3)
+            # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+            self.create_plane_from_triangle(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+        if np.shape(vertexes)[0] == 4:
+            self.vertex1 = np.array(vertexes[1])
+            self.vertex2 = np.array(vertexes[2])
+            self.vertex3 = np.array(vertexes[3])
+            mod = np.linalg.norm(vertexes[0])
+            self.normal = np.array(vertexes[0]/mod)
+            # logger.debug(np.linalg.norm(self.normal))
+            # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+            self.create_plane_from_triangle(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))

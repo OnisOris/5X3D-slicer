@@ -1,11 +1,11 @@
-from plane import Plane
-from line import Line
+# from plane import Plane
+# from line import Line
 import numpy as np
 from loguru import logger
 from math import sqrt
 
 
-def point_from_line_line_intersection(line1: Line, line2: Line):
+def point_from_line_line_intersection(line1, line2):
     # проверка на параллельность прямых
     var = np.dot([line1.p1, line1.p2, line1.p3], [line2.p1, line2.p2, line2.p3])
     # TODO: Сделать проверку на нахождение прямых в одной плоскости и их совпадение
@@ -16,7 +16,7 @@ def point_from_line_line_intersection(line1: Line, line2: Line):
         return np.array([x, y, z])
 
 
-def point_from_plane_line_intersection(line: Line, plane: Plane) -> np.ndarray or None:
+def point_from_plane_line_intersection(line, plane) -> np.ndarray or None:
     """
     Функция находит координаты точки пересечения линии line и плоскости plane.
     :param line:
@@ -60,7 +60,7 @@ def max_min_points(triangles):
     return max_xyz, min_xyz
 
 
-def position_analyzer_of_point(point, plane: Plane) -> int:
+def position_analyzer_of_point(point, plane) -> int:
     """
     Функция принимает точку в виде списка [x, y, z] и плоскость класса Plane. Функция говорит, по какую сторону от
     плоскости лежит точка.
@@ -80,7 +80,7 @@ def position_analyzer_of_point(point, plane: Plane) -> int:
         return 0
 
 
-def position_analyze_of_triangle(triangle, plane: Plane) -> int:
+def position_analyze_of_triangle(triangle, plane) -> int:
     """
     Функция принимает массив треугольников 4x3, где строка 1 - вектор нормали, строки 2-4 - это координаты вершин
     треугольников и плоскость класса Plane и говорит о местоположении треугольника относительно этой плоскости.
@@ -126,41 +126,32 @@ def distance_between_two_points(point1, point2) -> float:
         return float(abs(array[0]) - abs(array[1]))
 
 
-def slicing(triangles, thiсk=0.1):
-    max_xyz, min_xyz = max_min_points(triangles)
-    z_min = min_xyz[2]
-    z_max = max_xyz[2]
-    hight = distance_between_two_points(z_min, z_max)
-    amount_of_layers = hight / thiсk
-    plane_array = np.array([])
-    slice_plane = Plane(0, 0, 1, -z_min)
-    points = []
-    # for i in range(round(amount_of_layers)):
-    for triangle in triangles:
-        position_index = position_analyze_of_triangle(triangle, slice_plane)
-        if position_index == 2:
-            # Создаем плоскость треугольника
-            plane = Plane(triangle)
-            # Создаем линию пересечения плоскостей треугольника и плоскости слайсинга
-            line = Line()
-            line.line_from_planes(plane, slice_plane)
-            # Линии из вершин треугольников
-            line1_2 = Line()
-            line1_2.line_create_from_points(triangle[1], triangle[2])
+def vector_from_two_points(point1, point2):
+    vector = np.array([point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]])
+    # logger.debug(vector)
+    return vector
 
-            line2_3 = Line()
-            line2_3.line_create_from_points(triangle[2], triangle[3])
 
-            line3_1 = Line()
-            line3_1.line_create_from_points(triangle[3], triangle[1])
+def normal_of_triangle(vertex1, vertex2, vertex3):
+    vertex1 = np.array(vertex1)
+    vertex2 = np.array(vertex2)
+    vertex3 = np.array(vertex3)
+    vector1 = vector_from_two_points(vertex1, vertex2)
+    vector2 = vector_from_two_points(vertex1, vertex3)
+    normal = np.cross(vector1, vector2)
+    # logger.debug(normal)
+    mod_normal = np.linalg.norm(normal)
+    # logger.debug(mod_normal)
+    # Проверка на равенство длины вектора нормали единице
+    if mod_normal != 1.0:
+        normal = np.array([normal[0]/mod_normal, normal[1]/mod_normal, normal[2]/mod_normal])
+        # normal[0] = normal[0] / mod_normal
+        # normal[1] = normal[1] / mod_normal
+        # normal[2] = normal[2] / mod_normal
+    # logger.debug(np.linalg.norm(normal))
+    # logger.debug(mod_normal)
+    return normal
 
-            point1 = point_from_line_line_intersection(line, line1_2)
-            point2 = point_from_line_line_intersection(line, line2_3)
-            point3 = point_from_line_line_intersection(line, line3_1)
-            points.append(point1)
-            points.append(point2)
-            points.append(point3)
-    logger.debug(points)
 
 
 # class ThreeDTool:

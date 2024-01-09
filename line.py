@@ -1,6 +1,6 @@
 from math import sqrt
 from loguru import logger
-
+from threeDTool import *
 
 class Line:
     # Уравнение вида:
@@ -178,3 +178,11 @@ class Line_segment(Line):
         self.point1 = [x1, y1, z1]
         self.point2 = [x2, y2, z2]
         self.lenth = sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
+
+
+    # def lsftp(self, triangle, plane):
+    #     '''
+    #      Line segment from triangle and plane или сокращенно lsftp
+    #     :return:
+    #     '''
+    # position_analyze_of_triangle()
