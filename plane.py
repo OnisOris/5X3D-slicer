@@ -287,3 +287,5 @@ class Triangle(Plane):
     @normal.setter
     def normal(self, normal):
         self.__normal = normal
+    def triangle_array(self):
+        return np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3])
