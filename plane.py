@@ -240,18 +240,50 @@ class Triangle(Plane):
         super().__init__()
         logger.debug(np.shape(vertexes))
         if np.shape(vertexes)[0] == 3:
-            self.vertex1 = np.array(vertexes[0])
-            self.vertex2 = np.array(vertexes[1])
-            self.vertex3 = np.array(vertexes[2])
-            self.normal = normal_of_triangle(self.vertex1, self.vertex2, self.vertex3)
+            self.__vertex1 = np.array(vertexes[0])
+            self.__vertex2 = np.array(vertexes[1])
+            self.__vertex3 = np.array(vertexes[2])
+            self.__normal = normal_of_triangle(self.__vertex1, self.__vertex2, self.__vertex3)
             # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
-            self.create_plane_from_triangle(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+            self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
         if np.shape(vertexes)[0] == 4:
-            self.vertex1 = np.array(vertexes[1])
-            self.vertex2 = np.array(vertexes[2])
-            self.vertex3 = np.array(vertexes[3])
+            self.__vertex1 = np.array(vertexes[1])
+            self.__vertex2 = np.array(vertexes[2])
+            self.__vertex3 = np.array(vertexes[3])
             mod = np.linalg.norm(vertexes[0])
-            self.normal = np.array(vertexes[0]/mod)
+            self.__normal = np.array(vertexes[0]/mod)
             # logger.debug(np.linalg.norm(self.normal))
             # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
-            self.create_plane_from_triangle(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
+            self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
+
+    @property
+    def vertex1(self):
+        return self.__vertex1
+
+    @property
+    def vertex2(self):
+        return self.__vertex2
+
+    @property
+    def vertex3(self):
+        return self.__vertex3
+
+    @property
+    def normal(self):
+        return self.__normal
+
+    @vertex1.setter
+    def vertex1(self, vertex1):
+        self.__vertex1 = vertex1
+
+    @vertex2.setter
+    def vertex2(self, vertex2):
+        self.__vertex2 = vertex2
+
+    @vertex3.setter
+    def vertex3(self, vertex3):
+        self.__vertex3 = vertex3
+
+    @normal.setter
+    def normal(self, normal):
+        self.__normal = normal
