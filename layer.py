@@ -3,7 +3,7 @@ from plane import Plane
 
 class Layer:
 
-    def __init__(self, plane: Plane, layer_thickness=0.1):
+    def __init__(self, plane: Plane, shape_array, layer_thickness=0.1):
         '''
 
         :param plane:
@@ -11,5 +11,12 @@ class Layer:
         '''
         self.layer_thickness = layer_thickness
         self.first_plane = plane
+        self.shape_array = shape_array
+        self.second_plane = self.create_second_plane(self.first_plane)
+
     def create_second_plane(self, plane: Plane):
-        d=0
+        second_plane = plane
+        second_plane.d -= self.layer_thickness
+        return second_plane
+
+
