@@ -1,5 +1,10 @@
 from math import sqrt
+from typing import Any
+
 from loguru import logger
+import numpy as np
+from numpy import ndarray, dtype
+
 from threeDTool import *
 
 
@@ -66,6 +71,9 @@ class Line:
         logger.debug(
             f'a = {self.__a}, b = {self.__b}, c = {self.__c}, p1 = {self.__p1}, p2 = {self.__p2}, p3 = {self.__p3}')
 
+    def coeffs(self) -> ndarray:
+        return np.array([self.__a, self.__b, self.__c, self.__p1, self.__p2, self.__p3])
+
     # Создание коэффициентов прямой по двум точкам в пространстве.
     # Принимает точку в виде массива 1x3 объекта класса numpy.array с тремя координатами [x, y, z]
     # point1 = [x1, y1, z1]
@@ -84,15 +92,21 @@ class Line:
         p1 = point2[0] - point1[0]
         p2 = point2[1] - point1[1]
         p3 = point2[2] - point1[2]
-        mod_N = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
-        # Проверка на равенство длины вектора нормали единице
-        if mod_N != 1.0:
-            p1 = p1 / mod_N
-            p2 = p2 / mod_N
-            p3 = p3 / mod_N
-        self.__p1 = p1
-        self.__p2 = p2
-        self.__p3 = p3
+        if p1 == 0 and p2 == 0 and p3 == 0:
+            logger.error("Создать линию из двух одинаковых точек нельзя")
+            logger.debug(f"{p1, p2, p3}")
+
+        else:
+            mod_N = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
+            logger.debug(mod_N)
+            # Проверка на равенство длины вектора нормали единице
+            if mod_N != 1.0:
+                p1 = p1 / mod_N
+                p2 = p2 / mod_N
+                p3 = p3 / mod_N
+            self.__p1 = p1
+            self.__p2 = p2
+            self.__p3 = p3
 
     def line_from_planes(self, plane1, plane2):
         '''
@@ -107,7 +121,7 @@ class Line:
         p1 = plane1.b * plane2.c - plane2.b * plane1.c  # проверено
         p2 = plane1.c * plane2.a - plane2.c * plane1.a
         p3 = plane1.a * plane2.b - plane2.a * plane1.b
-        logger.debug(f"{p1} {p2} {p3}")
+        # logger.debug(f"{p1} {p2} {p3}")
         # Сначала проверяем не параллельны ли эти две плоскости:
 
         if p1 != 0 and p2 != 0 and p3 != 0:
@@ -143,7 +157,7 @@ class Line:
                 self.__c = 0
                 self.__a = (plane2.d * plane1.b - plane1.d * plane2.b) / val1_1
                 self.__b = - (plane2.a * self.__a + plane2.d) / plane2.b
-            if val1_2 != 0 and plane2.b == 0:
+            elif val1_2 != 0 and plane2.b == 0:
                 self.__c = 0
                 self.__b = (plane1.a * plane2.d - plane1.d * plane2.a) / val1_2
                 self.__a = - (plane2.b * self.__c + plane2.d) / plane2.a
@@ -183,7 +197,7 @@ class Line:
 
 #         Если параллельны, то z = -D/C (d и c от параллельной плоскости)
 class Line_segment(Line):
-    def __init__(self,a=0, b=0, c=0, p1=0, p2=0, p3=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0):
+    def __init__(self, a=0, b=0, c=0, p1=0, p2=0, p3=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0):
         super().__init__(a, b, c, p1, p2, p3)
         self.point1 = [x1, y1, z1]
         self.point2 = [x2, y2, z2]
@@ -198,9 +212,9 @@ class Line_segment(Line):
     #     # if pat == 2:
     #     #     point1 = point_from_plane_line_intersection()
     def point_belongs_to_the_segment(self, point):
-        eq1 = self.p2*self.p3*(point[0]-self.a) - self.p1*self.p3*(point[1]-self.b)
-        eq2 = self.p1*self.p3*(point[1]-self.b) - self.p1*self.p2*(point[2]-self.c)
-        eq3 = self.p1*self.p2*(point[2]-self.c) - self.p2*self.p3*(point[0]-self.a)
+        eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
+        eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
+        eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
         logger.debug(eq1)
         logger.debug(eq2)
         logger.debug(eq3)
