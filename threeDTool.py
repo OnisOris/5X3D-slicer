@@ -109,6 +109,30 @@ def position_analyzer_of_point(point, plane) -> int:
     else:
         return 0
 
+def position_analyzer_of_line_and_plane(line, plane):
+    '''
+    Функция анализирует положение линии относительно плоскости. Линия может быть: параллельна плоскости, лежать в ней,
+    пересекать плоскость в точке.
+    :param line:
+    :param plane:
+    :return: 0, если линия пренадлежит плоскости, 1, если линия параллельна плоскости и не принадлежит ей, 2, если
+    линия не параллельна плоскости и пересекает ее в какой-то точке
+    '''
+    # Если var1 == 0 и var2 == 1, то линия либо в плоскости, если var1 != 0 и var2 == 1, то линия не в плоскости и
+    # параллельна ей, если var2 != 1, то линия пересекает плоскость
+    var1 = plane.a*line.a + plane.b*line.b + plane.c*line.c + plane.d
+    var2 = np.linalg.norm(np.cross(line.coeffs()[3:6], plane.get_N()))
+    logger.debug(f"var1 = {var1}, var2 = {var2}")
+    if var1 == 0 and var2 == 1:
+        return 0
+    elif var1 != 0 and var2 == 1:
+        return 1
+    elif var2 != 1:
+        return 2
+    else:
+        logger.error("Что-то пошло не так, таких ситуаций в реальности не существует")
+
+
 
 def position_analyze_of_triangle(triangle, plane) -> int:
     """
