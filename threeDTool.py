@@ -35,13 +35,11 @@ def check_position_lines(line1: Line, line2: Line) -> int:
 def point_from_line_line_intersection(line1, line2):
     # Проверка на пренадлежность одной плоскости
 
-    # проверка на параллельность прямых
-    var = np.dot([line1.p1, line1.p2, line1.p3], [line2.p1, line2.p2, line2.p3])
-    # TODO: Сделать проверку на нахождение прямых в одной плоскости и их совпадение
-    if var != 1:
+    # проверка:
+    var = check_position_lines(line1, line2)
+    logger.debug(f"var = {var}")
+    if var == 2:
         logger.debug((line1.p2 * line2.b - line1.b * line2.p2) / (line1. p2 - line2.p2))
-
-
         x = (line1.p1 * line2.a - line1.a * line2.p1) / (line1.p1 - line2.p1)
         y = (line1.p2 * line2.b - line1.b * line2.p2) / (line1.p2 - line2.p2)
         z = (line1.p3 * line2.c - line1.c * line2.p3) / (line1.p3 - line2.p3)
