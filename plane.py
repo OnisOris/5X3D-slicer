@@ -68,7 +68,7 @@ class Plane:
     def d(self, d):
         self.__d = d
 
-    def create_plane_from_triangle(self, triangle, point=1) -> None:
+    def create_plane_from_triangle(self, triangle, point=1, create_normal=False) -> None:
         """
         Данная функция принимает массив 4x3. Строка 1 - координаты вектора нормали (пишутся координаты только второй
         точки, первая исходит из нуля).
@@ -80,9 +80,14 @@ class Plane:
         где D = -Ax_0 - By_o - Cz_0
         Поэтому мы берем первую вершину треугольника (по умолчанию point=1) и вектор нормали и на основе
         него создаем уравнение плоскости.
+        Если create_normal = True, то это значит, что на вход идет матрица 3x3 с вершинами треугольника, тогда вектор
+        нормали vector_N создается автоматически
         :return: None
         """
-        vector_N = triangle[0]
+        if create_normal:
+            vector_N = normal_of_triangle(triangle[0], triangle[1], triangle[2])
+        else:
+            vector_N = triangle[0]
         mod = sqrt(vector_N[0] ** 2 + vector_N[1] ** 2 + vector_N[2] ** 2)
         # Из-за неточного экспорта в STL и вычислений в Python модуль не будет точно равен 1,
         # но должен быть примерно равен 1
@@ -243,10 +248,11 @@ class Triangle(Plane):
     Если np.shape(vertexes)[0] == 4, то 4я координата - вектор нормали
 
     """
-    def __init__(self, vertexes):
+    def __init__(self, vertexes, auto_create_normal=False):
         super().__init__()
         logger.debug(np.shape(vertexes))
-        if np.shape(vertexes)[0] == 3:
+
+        if np.shape(vertexes)[0] == 3 or auto_create_normal:
             self.__vertex1 = np.array(vertexes[0])
             self.__vertex2 = np.array(vertexes[1])
             self.__vertex3 = np.array(vertexes[2])
