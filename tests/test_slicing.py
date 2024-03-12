@@ -7,7 +7,7 @@ from plane import Plane, Triangle
 from parser_stl import Parser_stl
 from threeDTool import *
 
-path = "../cube.stl"
+path = "../test.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
@@ -36,7 +36,7 @@ def slicing(triangles, thiсk=0.1):
             # Создаем плоскость треугольника
             # print(triangle)
             plane = Plane()
-            plane.create_plane_from_triangle(triangle)
+            plane.create_plane_from_triangle(triangle, create_normal=True)
             # Создаем линию пересечения плоскостей треугольника и плоскости слайсинга
             line = Line()
             logger.debug(f"plane1: {plane.a, plane.b, plane.c, plane.d}, slice_plane: {slice_plane.a, slice_plane.b, slice_plane.c, slice_plane.d} \n ")
@@ -44,17 +44,18 @@ def slicing(triangles, thiсk=0.1):
             # Линии из вершин треугольников
             line1_2 = Line()
             line1_2.line_create_from_points(triangle[1], triangle[2])
+
             line2_3 = Line()
             line2_3.line_create_from_points(triangle[2], triangle[3])
             line3_1 = Line()
             line3_1.line_create_from_points(triangle[3], triangle[1])
-            # тОЧКИ
+            # Точки
             point1 = point_from_line_line_intersection(line, line1_2)
             point2 = point_from_line_line_intersection(line, line2_3)
             point3 = point_from_line_line_intersection(line, line3_1)
             points.append(point1)
             points.append(point2)
             points.append(point3)
-            # logger.debug(point3)
-    # logger.debug(points)
+            logger.debug(point3)
+    logger.debug(points)
 slicing(triangles)
