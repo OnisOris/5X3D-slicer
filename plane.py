@@ -68,6 +68,14 @@ class Plane:
     def d(self, d):
         self.__d = d
 
+    def get_N(self):
+        """
+        Возвращает координаты вектора нормали плоскости
+        :return: np.array([a, b, c])
+        """
+
+        return np.array([self.__a, self.__b, self.__c])
+
     def create_plane_from_triangle(self, triangle, point=1, create_normal=False) -> None:
         """
         Данная функция принимает массив 4x3. Строка 1 - координаты вектора нормали (пишутся координаты только второй
