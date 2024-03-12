@@ -20,7 +20,7 @@ def check_position_lines(line1: Line, line2: Line) -> int:
     var = np.linalg.det(arr)
     if var == 0:
         cross = np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6]))
-        logger.debug(cross)
+        # logger.debug(cross)
         if cross == 0:
             # прямые параллельны
             return 1
@@ -37,9 +37,9 @@ def point_from_line_line_intersection(line1, line2):
 
     # проверка:
     var = check_position_lines(line1, line2)
-    logger.debug(f"var = {var}")
+    # logger.debug(f"var = {var}")
     if var == 2:
-        logger.debug((line1.p2 * line2.b - line1.b * line2.p2) / (line1. p2 - line2.p2))
+        # logger.debug((line1.p2 * line2.b - line1.b * line2.p2) / (line1. p2 - line2.p2))
         x = (line1.p1 * line2.a - line1.a * line2.p1) / (line1.p1 - line2.p1)
         y = (line1.p2 * line2.b - line1.b * line2.p2) / (line1.p2 - line2.p2)
         z = (line1.p3 * line2.c - line1.c * line2.p3) / (line1.p3 - line2.p3)
@@ -56,11 +56,11 @@ def point_from_plane_line_intersection(line, plane) -> np.ndarray or None:
     # Проверка на параллельность линии плоскости
     vector_n = np.array([plane.a, plane.b, plane.c])
     vector_line = np.array([line.p1, line.p2, line.p3])
-    logger.debug(np.dot(vector_n, vector_line))
+    # logger.debug(np.dot(vector_n, vector_line))
     if np.dot(vector_n, vector_line) != 0:
         t = -(plane.a * line.a + plane.b * line.b + plane.c * line.c + plane.d) / (
                 plane.a * line.p1 + plane.b * line.p2 + plane.c * line.p3)
-        logger.debug(t)
+        # logger.debug(t)
         x = t * line.p1 + line.a
         y = t * line.p2 + line.b
         z = t * line.p3 + line.c
