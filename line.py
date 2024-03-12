@@ -5,7 +5,7 @@ from loguru import logger
 import numpy as np
 from numpy import ndarray, dtype
 
-from threeDTool import *
+# from threeDTool import *
 
 
 class Line:
@@ -94,11 +94,11 @@ class Line:
         p3 = point2[2] - point1[2]
         if p1 == 0 and p2 == 0 and p3 == 0:
             logger.error("Создать линию из двух одинаковых точек нельзя")
-            logger.debug(f"{p1, p2, p3}")
+            # logger.debug(f"{p1, p2, p3}")
 
         else:
             mod_N = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
-            logger.debug(mod_N)
+            # logger.debug(mod_N)
             # Проверка на равенство длины вектора нормали единице
             if mod_N != 1.0:
                 p1 = p1 / mod_N
@@ -110,11 +110,11 @@ class Line:
 
     def line_from_planes(self, plane1, plane2):
         '''
-        Необходимо проверить следующие ситуации:
-        Если plane1 перпендикулярна z и не лежит в точке z = 0, то за нуль брать y.  
+        Функция, создающая линию из двух пересекающихся плоскостей.
         :param plane1:
         :param plane2:
-        :return:
+        :return: True, если mod_p - нулевой вектор. False, если плоскости не пересекаются,
+        либо параллельны, либо совпадают
         '''
 
         # Векторное произведение векторов нормали n_1 b n_2
@@ -132,7 +132,7 @@ class Line:
                 p3 = p3 / mod_p
             elif mod_p == 0:
                 logger.error("P - нулевой вектор")
-                return None
+                return True
             self.__p1 = p1
             self.__p2 = p2
             self.__p3 = p3
@@ -184,8 +184,14 @@ class Line:
                 logger.debug("Zero Error")
         else:
             logger.debug("Плоскости не пересекаются и либо параллельны, либо совпадают")
+            return False
 
     def point_belongs_to_the_line(self, point):
+        '''
+        Функция, определющая, принадлежит ли точка прямой
+        :param point: список из координат [x, y, z]
+        :return: True, если принадлежит, False, если не принадлежит
+        '''
         eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
         eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
         eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
@@ -194,8 +200,6 @@ class Line:
         else:
             return False
 
-
-#         Если параллельны, то z = -D/C (d и c от параллельной плоскости)
 class Line_segment(Line):
     def __init__(self, a=0, b=0, c=0, p1=0, p2=0, p3=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0):
         super().__init__(a, b, c, p1, p2, p3)
