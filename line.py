@@ -121,11 +121,10 @@ class Line:
         p1 = plane1.b * plane2.c - plane2.b * plane1.c  # проверено
         p2 = plane1.c * plane2.a - plane2.c * plane1.a
         p3 = plane1.a * plane2.b - plane2.a * plane1.b
-        # logger.debug(f"{p1} {p2} {p3}")
+        mod_p = np.linalg.norm(np.cross(plane1.get_N(), plane2.get_N()))
         # Сначала проверяем не параллельны ли эти две плоскости:
-
-        if p1 != 0 and p2 != 0 and p3 != 0:
-            mod_p = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
+        if mod_p != 0:
+            # mod_p = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
             if mod_p != 1.0 and mod_p != 0:
                 p1 = p1 / mod_p
                 p2 = p2 / mod_p
