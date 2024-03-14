@@ -4,6 +4,7 @@ import numpy as np
 from loguru import logger
 from math import sqrt
 
+
 def check_position_lines(line1: Line, line2: Line) -> int:
     """
     :param line1:
@@ -47,26 +48,30 @@ def point_from_line_line_intersection(line1, line2):
     # проверка:
     var = check_position_lines(line1, line2)
     if var == 2:
-        # Следующие условия нужны для проверки на принадлежность векторов плоскостям xy, xz, yz, если оба вектора лежат
-        # в одной из плоскостей, координаты векторов x или y или z попарно будут равны нулю и произойдет ошибка деления
-        # на нуль
-        line1.info()
-        line2.info()
-        if line1.p1 - line2.p1 == 0:
-            x = line1.p1
+        if line2.p1 * line1.p3 != line2.p3 * line1.p1:
+            # t_z
+            t = ((line1.a * line1.p3 - line2.a * line1.p3 + line2.c * line1.p1 - line1.c * line1.p1) /
+                 (line2.p1 * line1.p3 - line2.p3 * line1.p1))
+        elif line2.p1 * line1.p2 != line2.p2 * line1.p1:
+            t = ((line1.a * line1.p2 - line2.a * line1.p2 + line2.b * line1.p1 - line1.b * line1.p1) /
+                 (line2.p1 * line1.p2 - line2.p2 * line1.p1))
+        elif line2.p2 * line1.p3 != line2.p3 * line1.p2:
+            t = ((line1.b * line1.p3 - line2.b * line1.p3 + line1.p2 * line2.c - line1.p2 * line1.c) /
+                 (line2.p2 * line1.p3 - line2.p3 * line1.p2))
+        if not 0 in line1.coeffs()[3:6] and not 0 in line2.coeffs()[3:6]:
+            z = (line2.b - line1.b + line1.c * line1.p2 / line1.p3 -
+                 line2.c * line2.p2 / line2.p3) / (line1.p2 / line1.p3 - line2.p2 / line2.p3)
+            x = (line2.c - line1.c + line1.a * line1.p3 / line1.p1 -
+                 line2.a * line2.p3 / line2.p1) / (line1.p3 / line1.p1 - line2.p3 / line2.p1)
+            y = (line2.a - line1.a + line1.b * line1.p1 / line1.p2 -
+                 line2.b * line2.p1 / line2.p2) / (line1.p1 / line1.p2 - line2.p1 / line2.p2)
         else:
-            x = (line1.p1 * line2.a - line1.a * line2.p1) / (line1.p1 - line2.p1)
-        if line1.p2 - line2.p2 == 0:
-            y = line1.p2
-        else:
-            y = (line1.p2 * line2.b - line1.b * line2.p2) / (line1.p2 - line2.p2)
-        if line1.p3 - line2.p3 == 0:
-            z = line1.p3
-        else:
-            z = (line1.p3 * line2.c - line1.c * line2.p3) / (line1.p3 - line2.p3)
+            x = t * line2.p1 + line2.a
+            y = t * line2.p2 + line2.b
+            z = t * line2.p3 + line2.c
         return np.array([x, y, z])
     else:
-        logger.error("Прямые не пересекаются")
+        logger.error("Прямые не пересекаются, либо совпадают")
 
 
 def point_from_plane_line_intersection(line, plane) -> np.ndarray or None:
@@ -132,6 +137,7 @@ def position_analyzer_of_point(point, plane) -> int:
     else:
         return 0
 
+
 def position_analyzer_of_line_and_plane(line, plane):
     '''
     Функция анализирует положение линии относительно плоскости. Линия может быть: параллельна плоскости, лежать в ней,
@@ -143,7 +149,7 @@ def position_analyzer_of_line_and_plane(line, plane):
     '''
     # Если var1 == 0 и var2 == 1, то линия либо в плоскости, если var1 != 0 и var2 == 1, то линия не в плоскости и
     # параллельна ей, если var2 != 1, то линия пересекает плоскость
-    var1 = plane.a*line.a + plane.b*line.b + plane.c*line.c + plane.d
+    var1 = plane.a * line.a + plane.b * line.b + plane.c * line.c + plane.d
     var2 = np.linalg.norm(np.cross(line.coeffs()[3:6], plane.get_N()))
     logger.debug(f"var1 = {var1}, var2 = {var2}")
     if var1 == 0 and var2 == 1:
@@ -154,7 +160,6 @@ def position_analyzer_of_line_and_plane(line, plane):
         return 2
     else:
         logger.error("Что-то пошло не так, таких ситуаций в реальности не существует")
-
 
 
 def position_analyze_of_triangle(triangle, plane) -> int:
@@ -183,8 +188,8 @@ def position_analyze_of_triangle(triangle, plane) -> int:
         return -1
     elif var1 == 0 and var2 == 0 and var3 == 0:
         return 0
-    elif var1 == 0 and var2 == 1 and var3 == 1 or var1 == 0 and var2 == -1 and var3 == -1\
-            or var1 == 1 and var2 == 0 and var3 == 1 or var1 == -1 and var2 == 0 and var3 == -1\
+    elif var1 == 0 and var2 == 1 and var3 == 1 or var1 == 0 and var2 == -1 and var3 == -1 \
+            or var1 == 1 and var2 == 0 and var3 == 1 or var1 == -1 and var2 == 0 and var3 == -1 \
             or var1 == 1 and var2 == 1 and var3 == 0 or var1 == -1 and var2 == -1 and var3 == 0:
         return -2
     else:
@@ -226,15 +231,13 @@ def normal_of_triangle(vertex1, vertex2, vertex3):
     # logger.debug(mod_normal)
     # Проверка на равенство длины вектора нормали единице
     if mod_normal != 1.0:
-        normal = np.array([normal[0]/mod_normal, normal[1]/mod_normal, normal[2]/mod_normal])
+        normal = np.array([normal[0] / mod_normal, normal[1] / mod_normal, normal[2] / mod_normal])
         # normal[0] = normal[0] / mod_normal
         # normal[1] = normal[1] / mod_normal
         # normal[2] = normal[2] / mod_normal
     # logger.debug(np.linalg.norm(normal))
     # logger.debug(mod_normal)
     return normal
-
-
 
 # class ThreeDTool:
 #     def __init__(self):
