@@ -12,7 +12,9 @@ def check_position_lines(line1: Line, line2: Line) -> int:
     :return: 0 - если линии не компланарны, 1 - если прямые компланарны параллельны, 2 - если прямые компланарны и не параллельны
     """
     logger.debug(np.array_equal(line1.coeffs()[0:3], line2.coeffs()[0:3]))
-    if np.array_equal(line1.coeffs()[0:3], line2.coeffs()[0:3]):
+    if (np.array_equal(line1.coeffs()[0:3], line2.coeffs()[0:3]) and
+            np.linalg.matrix_rank(np.array([line1.coeffs()[3:6], line2.coeffs()[3:6], line2.coeffs()[3:6]])) == 2):
+        np.linalg.det(np.array([line1.coeffs()[3:6], line2.coeffs()[3:6], line2.coeffs()[3:6]]))
         return 2
     else:
         line3 = Line()
@@ -47,7 +49,13 @@ def point_from_line_line_intersection(line1, line2):
     # Проверка на принадлежность одной плоскости
     # проверка:
     var = check_position_lines(line1, line2)
+    logger.debug(var)
     if var == 2:
+        if line1.coeffs()[3] == 0 and line1.coeffs()[4] == 0 and line1.coeffs()[5] == 0:
+            return None
+        elif line2.coeffs()[3] == 0 and line2.coeffs()[4] == 0 and line2.coeffs()[5] == 0:
+            return None
+
         if line2.p1 * line1.p3 != line2.p3 * line1.p1:
             # t_z
             t = ((line1.a * line1.p3 - line2.a * line1.p3 + line2.c * line1.p1 - line1.c * line1.p1) /
@@ -66,6 +74,8 @@ def point_from_line_line_intersection(line1, line2):
             y = (line2.a - line1.a + line1.b * line1.p1 / line1.p2 -
                  line2.b * line2.p1 / line2.p2) / (line1.p1 / line1.p2 - line2.p1 / line2.p2)
         else:
+            line1.info()
+            line2.info()
             x = t * line2.p1 + line2.a
             y = t * line2.p2 + line2.b
             z = t * line2.p3 + line2.c
