@@ -23,11 +23,8 @@ class Plane:
         :return:
         '''
         G = np.array([[-1], [-1], [-1]])
-        logger.debug(np.linalg.inv(matrix))
         abc = np.dot(np.linalg.inv(matrix), G)
-        logger.debug(abc.T[0])
         coefficients = np.array([abc.T[0][0], abc.T[0][1], abc.T[0][2], 1])
-        logger.debug(coefficients)
         self.__a = coefficients[0]
         self.__b = coefficients[1]
         self.__c = coefficients[2]
@@ -73,7 +70,6 @@ class Plane:
         Возвращает координаты вектора нормали плоскости
         :return: np.array([a, b, c])
         """
-
         return np.array([self.__a, self.__b, self.__c])
 
     def create_plane_from_triangle(self, triangle, point=1, create_normal=False) -> None:
@@ -108,9 +104,6 @@ class Plane:
         self.__a, self.__b, self.__c = a, b, c
         #  Вычисление коэффициента D
         self.__d = - self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
-        # logger.debug(np.linalg.norm([a, b, c]))
-        # if mod < 0.998 or mod > 1:
-        #     logger.warning("Модуль вектора vector_N меньше 0.998 или больше 1")
 
 
     ###################
@@ -121,9 +114,6 @@ class Plane:
         # TODO: при параллельности плоскости оси z все ломается, нужно поменять способ отображения
         hight = 20  # Высота прямоугольника
         lenth = 20  # Длина прямоугольника
-        # x = [lenth, -lenth]
-        # y = [hight, -hight]
-        # z = [self.projection_z()]
         x1 = -lenth / 2
         y1 = hight / 2
         z1 = self.projection_z(x1, y1)
@@ -167,12 +157,9 @@ class Plane:
                                 [points[1], point2],
                                 [points[2], point3],
                                 [points[3], point4]])
-        # logger.debug(points_proj)
         figures = []
         for i in range(4):
             figures.append(ax.plot(points_proj[i].T[0], points_proj[i].T[1], points_proj[i].T[2], c='b'))
-        # figure3 = ax.plot(points_proj[0], points_proj[1], points_proj[2], c='b')
-
         plt.show()
 
     def projection_z(self, point_x, point_y):
@@ -258,14 +245,11 @@ class Triangle(Plane):
     """
     def __init__(self, vertexes, auto_create_normal=False):
         super().__init__()
-        logger.debug(np.shape(vertexes))
-
         if np.shape(vertexes)[0] == 3 or auto_create_normal:
             self.__vertex1 = np.array(vertexes[0])
             self.__vertex2 = np.array(vertexes[1])
             self.__vertex3 = np.array(vertexes[2])
             self.__normal = normal_of_triangle(self.__vertex1, self.__vertex2, self.__vertex3)
-            # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
         if np.shape(vertexes)[0] == 4:
             self.__vertex1 = np.array(vertexes[1])
@@ -273,8 +257,6 @@ class Triangle(Plane):
             self.__vertex3 = np.array(vertexes[3])
             mod = np.linalg.norm(vertexes[0])
             self.__normal = np.array(vertexes[0]/mod)
-            # logger.debug(np.linalg.norm(self.normal))
-            # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
 
     @property

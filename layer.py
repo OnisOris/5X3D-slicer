@@ -12,7 +12,6 @@ class Layer:
         self.layer_thickness = layer_thickness
         self.first_plane = plane
         self.shape_array = shape_array
-        self.second_plane = self.create_second_plane(self.first_plane)
 
     def create_second_plane(self, plane: Plane):
         second_plane = plane

@@ -94,11 +94,8 @@ class Line:
         p3 = point2[2] - point1[2]
         if p1 == 0 and p2 == 0 and p3 == 0:
             logger.error("Создать линию из двух одинаковых точек нельзя")
-            # logger.debug(f"{p1, p2, p3}")
-
         else:
             mod_N = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
-            # logger.debug(mod_N)
             # Проверка на равенство длины вектора нормали единице
             if mod_N != 1.0:
                 p1 = p1 / mod_N
@@ -124,7 +121,6 @@ class Line:
         mod_p = np.linalg.norm(np.cross(plane1.get_N(), plane2.get_N()))
         # Сначала проверяем не параллельны ли эти две плоскости:
         if mod_p != 0:
-            # mod_p = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
             if mod_p != 1.0 and mod_p != 0:
                 p1 = p1 / mod_p
                 p2 = p2 / mod_p
@@ -206,22 +202,11 @@ class Line_segment(Line):
         self.point2 = [x2, y2, z2]
         self.lenth = sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
-    # def lsftp(self, triangle, plane):
-    #     '''
-    #      Line segment from triangle and plane или сокращенно lsftp
-    #     :return:
-    #     '''
-    #     pat = position_analyze_of_triangle(triangle.triangle_array())
-    #     # if pat == 2:
-    #     #     point1 = point_from_plane_line_intersection()
+
     def point_belongs_to_the_segment(self, point):
         eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
         eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
         eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
-        logger.debug(eq1)
-        logger.debug(eq2)
-        logger.debug(eq3)
-
         if eq1 == 0 and eq2 == 0 and eq3 == 0:
             if self.inorno(point[0]) and self.inorno(point[1] and self.inorno(point[2])):
                 return True
@@ -233,10 +218,18 @@ class Line_segment(Line):
     def inorno(self, coordinate):
         segment = [self.point1[0], self.point2[1]]
         segment.sort()
-        logger.debug(segment)
         if segment[0] <= coordinate <= segment[1] and segment[0] != segment[1]:
             return True
         elif segment[0] == segment[1]:
             logger.debug("Нулевой отрезок")
         else:
             return False
+
+    # def lsftp(self, triangle, plane):
+    #     '''
+    #      Line segment from triangle and plane или сокращенно lsftp
+    #     :return:
+    #     '''
+    #     pat = position_analyze_of_triangle(triangle.triangle_array())
+    #     # if pat == 2:
+    #     #     point1 = point_from_plane_line_intersection()

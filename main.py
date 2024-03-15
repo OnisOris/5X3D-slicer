@@ -1,7 +1,7 @@
 import numpy as np
 from loguru import logger
-# from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
+import matplotlib.pyplot as plt
 from line import Line, Line_segment
 from plane import Plane, Triangle
 from parser_stl import Parser_stl
@@ -11,9 +11,9 @@ from threeDTool import *
 #
 # print(seg.lenth)
 # TODO: сделать проверку перпендикулярности нормали к треугольнику, если вектор не перпендикулярен, то все ломается
-tri = [[1, 1, 0], [5, 2, -6], [3, 4, 5]]
-tr = Triangle(tri)
-logger.debug(tr.triangle_array())
+# tri = [[1, 1, 0], [5, 2, -6], [3, 4, 5]]
+# tr = Triangle(tri)
+# logger.debug(tr.triangle_array())
 # print(tr.normal)
 # logger.debug(tr.a)
 # logger.debug(tr.b)
@@ -21,13 +21,16 @@ logger.debug(tr.triangle_array())
 # logger.debug(tr.d)
 # logger.debug(tr.a*5+tr.b*2+tr.c*(-6)+tr.d)
 
+x = np.arange(0, 10.5, 0.5)
+y = np.cos(x)
+
+plt.scatter(x, y)
+plt.show()
 
 
 
 
-
-
-# path = "sphere.stl"
+# path = "cube.stl"
 # file = open(path, "r")
 # parser = Parser_stl()
 # triangles, name = parser.parse_stl(file)
@@ -132,39 +135,3 @@ logger.debug(tr.triangle_array())
 # a = np.array([0, 1])
 # b = np.append(a, a)
 # logger.debug(b)
-
-# def slicing(triangles, thiсk=0.1):
-#     max_xyz, min_xyz = max_min_points(triangles)
-#     z_min = min_xyz[2]
-#     z_max = max_xyz[2]
-#     hight = distance_between_two_points(z_min, z_max)
-#     amount_of_layers = hight / thiсk
-#     plane_array = np.array([])
-#     slice_plane = Plane(0, 0, 1, -z_min)
-#     points = []
-#     # for i in range(round(amount_of_layers)):
-#     for triangle in triangles:
-#         position_index = position_analyze_of_triangle(triangle, slice_plane)
-#         if position_index == 2:
-#             # Создаем плоскость треугольника
-#             plane = Plane(triangle)
-#             # Создаем линию пересечения плоскостей треугольника и плоскости слайсинга
-#             line = Line()
-#             line.line_from_planes(plane, slice_plane)
-#             # Линии из вершин треугольников
-#             line1_2 = Line()
-#             line1_2.line_create_from_points(triangle[1], triangle[2])
-#
-#             line2_3 = Line()
-#             line2_3.line_create_from_points(triangle[2], triangle[3])
-#
-#             line3_1 = Line()
-#             line3_1.line_create_from_points(triangle[3], triangle[1])
-#
-#             point1 = point_from_line_line_intersection(line, line1_2)
-#             point2 = point_from_line_line_intersection(line, line2_3)
-#             point3 = point_from_line_line_intersection(line, line3_1)
-#             points.append(point1)
-#             points.append(point2)
-#             points.append(point3)
-#     logger.debug(points)
