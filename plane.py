@@ -23,11 +23,8 @@ class Plane:
         :return:
         '''
         G = np.array([[-1], [-1], [-1]])
-        logger.debug(np.linalg.inv(matrix))
         abc = np.dot(np.linalg.inv(matrix), G)
-        logger.debug(abc.T[0])
         coefficients = np.array([abc.T[0][0], abc.T[0][1], abc.T[0][2], 1])
-        logger.debug(coefficients)
         self.__a = coefficients[0]
         self.__b = coefficients[1]
         self.__c = coefficients[2]
@@ -68,7 +65,14 @@ class Plane:
     def d(self, d):
         self.__d = d
 
-    def create_plane_from_triangle(self, triangle, point=1) -> None:
+    def get_N(self):
+        """
+        Возвращает координаты вектора нормали плоскости
+        :return: np.array([a, b, c])
+        """
+        return np.array([self.__a, self.__b, self.__c])
+
+    def create_plane_from_triangle(self, triangle, point=1, create_normal=False) -> None:
         """
         Данная функция принимает массив 4x3. Строка 1 - координаты вектора нормали (пишутся координаты только второй
         точки, первая исходит из нуля).
@@ -80,9 +84,14 @@ class Plane:
         где D = -Ax_0 - By_o - Cz_0
         Поэтому мы берем первую вершину треугольника (по умолчанию point=1) и вектор нормали и на основе
         него создаем уравнение плоскости.
+        Если create_normal = True, то это значит, что на вход идет матрица 3x3 с вершинами треугольника, тогда вектор
+        нормали vector_N создается автоматически
         :return: None
         """
-        vector_N = triangle[0]
+        if create_normal:
+            vector_N = normal_of_triangle(triangle[0], triangle[1], triangle[2])
+        else:
+            vector_N = triangle[0]
         mod = sqrt(vector_N[0] ** 2 + vector_N[1] ** 2 + vector_N[2] ** 2)
         # Из-за неточного экспорта в STL и вычислений в Python модуль не будет точно равен 1,
         # но должен быть примерно равен 1
@@ -95,9 +104,6 @@ class Plane:
         self.__a, self.__b, self.__c = a, b, c
         #  Вычисление коэффициента D
         self.__d = - self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
-        # logger.debug(np.linalg.norm([a, b, c]))
-        # if mod < 0.998 or mod > 1:
-        #     logger.warning("Модуль вектора vector_N меньше 0.998 или больше 1")
 
 
     ###################
@@ -108,9 +114,6 @@ class Plane:
         # TODO: при параллельности плоскости оси z все ломается, нужно поменять способ отображения
         hight = 20  # Высота прямоугольника
         lenth = 20  # Длина прямоугольника
-        # x = [lenth, -lenth]
-        # y = [hight, -hight]
-        # z = [self.projection_z()]
         x1 = -lenth / 2
         y1 = hight / 2
         z1 = self.projection_z(x1, y1)
@@ -154,12 +157,9 @@ class Plane:
                                 [points[1], point2],
                                 [points[2], point3],
                                 [points[3], point4]])
-        # logger.debug(points_proj)
         figures = []
         for i in range(4):
             figures.append(ax.plot(points_proj[i].T[0], points_proj[i].T[1], points_proj[i].T[2], c='b'))
-        # figure3 = ax.plot(points_proj[0], points_proj[1], points_proj[2], c='b')
-
         plt.show()
 
     def projection_z(self, point_x, point_y):
@@ -236,15 +236,20 @@ class Plane:
 
 
 class Triangle(Plane):
-    def __init__(self, vertexes):
+    """
+    Класс треугольника. При инициализации объекта происходит проверка на количество составляющих.
+    Если np.shape(vertexes)[0] == 3, то считается, что в класс подаются вершины треугольника. Тогда нормаль считается
+    по принципу правого винта, где напрвление задает порядок вершин.
+    Если np.shape(vertexes)[0] == 4, то 4я координата - вектор нормали
+
+    """
+    def __init__(self, vertexes, auto_create_normal=False):
         super().__init__()
-        logger.debug(np.shape(vertexes))
-        if np.shape(vertexes)[0] == 3:
+        if np.shape(vertexes)[0] == 3 or auto_create_normal:
             self.__vertex1 = np.array(vertexes[0])
             self.__vertex2 = np.array(vertexes[1])
             self.__vertex3 = np.array(vertexes[2])
             self.__normal = normal_of_triangle(self.__vertex1, self.__vertex2, self.__vertex3)
-            # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
         if np.shape(vertexes)[0] == 4:
             self.__vertex1 = np.array(vertexes[1])
@@ -252,8 +257,6 @@ class Triangle(Plane):
             self.__vertex3 = np.array(vertexes[3])
             mod = np.linalg.norm(vertexes[0])
             self.__normal = np.array(vertexes[0]/mod)
-            # logger.debug(np.linalg.norm(self.normal))
-            # logger.debug(np.array([self.normal, self.vertex1, self.vertex2, self.vertex3]))
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
 
     @property
