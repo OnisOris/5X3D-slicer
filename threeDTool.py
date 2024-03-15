@@ -52,26 +52,20 @@ def point_from_line_line_intersection(line1, line2, log=False):
         elif line2.coeffs()[3] == 0 and line2.coeffs()[4] == 0 and line2.coeffs()[5] == 0:
             return None
         if line2.p1 * line1.p3 != line2.p3 * line1.p1:
-            # t_z
+            # t_2^x
             t = ((line1.a * line1.p3 - line2.a * line1.p3 + line2.c * line1.p1 - line1.c * line1.p1) /
                  (line2.p1 * line1.p3 - line2.p3 * line1.p1))
-        elif line2.p1 * line1.p2 != line2.p2 * line1.p1:
-            t = ((line1.a * line1.p2 - line2.a * line1.p2 + line2.b * line1.p1 - line1.b * line1.p1) /
-                 (line2.p1 * line1.p2 - line2.p2 * line1.p1))
         elif line2.p2 * line1.p3 != line2.p3 * line1.p2:
+            # t_2^y
             t = ((line1.b * line1.p3 - line2.b * line1.p3 + line1.p2 * line2.c - line1.p2 * line1.c) /
                  (line2.p2 * line1.p3 - line2.p3 * line1.p2))
-        if not 0 in line1.coeffs()[3:6] and not 0 in line2.coeffs()[3:6]:
-            z = (line2.b - line1.b + line1.c * line1.p2 / line1.p3 -
-                 line2.c * line2.p2 / line2.p3) / (line1.p2 / line1.p3 - line2.p2 / line2.p3)
-            x = (line2.c - line1.c + line1.a * line1.p3 / line1.p1 -
-                 line2.a * line2.p3 / line2.p1) / (line1.p3 / line1.p1 - line2.p3 / line2.p1)
-            y = (line2.a - line1.a + line1.b * line1.p1 / line1.p2 -
-                 line2.b * line2.p1 / line2.p2) / (line1.p1 / line1.p2 - line2.p1 / line2.p2)
         else:
-            x = t * line2.p1 + line2.a
-            y = t * line2.p2 + line2.b
-            z = t * line2.p3 + line2.c
+            # t_2^z
+            t = ((line1.a * line1.p2 - line2.a * line1.p2 + line2.b * line1.p1 - line1.b * line1.p1) /
+                 (line2.p1 * line1.p2 - line2.p2 * line1.p1))
+        x = t * line2.p1 + line2.a
+        y = t * line2.p2 + line2.b
+        z = t * line2.p3 + line2.c
         return np.array([x, y, z])
     else:
         if log:
