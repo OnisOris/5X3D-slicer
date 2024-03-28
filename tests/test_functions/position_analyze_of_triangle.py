@@ -1,7 +1,7 @@
 from threeDTool import position_analyze_of_triangle
 from parser_stl import Parser_stl
 from plane import Triangle, Plane
-path = "C:\\Users\\mixai\\OneDrive - ITMO UNIVERSITY\\code\\5X3D-slicer\\cube.stl"
+path = "/test_models/cube.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
