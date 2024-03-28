@@ -1,9 +1,10 @@
 import numpy as np
 from loguru import logger
 import matplotlib.pyplot as plt
-from line import Line
+from line import Line, Line_segment
 from math import sqrt
 from threeDTool import *
+from twoDTool import *
 
 
 class Plane:
@@ -95,16 +96,14 @@ class Plane:
         mod = sqrt(vector_N[0] ** 2 + vector_N[1] ** 2 + vector_N[2] ** 2)
         # Из-за неточного экспорта в STL и вычислений в Python модуль не будет точно равен 1,
         # но должен быть примерно равен 1
-        # logger.debug(mod)
         if mod != 1:
-            a, b, c = vector_N[0]/mod, vector_N[1]/mod, vector_N[2]/mod
+            a, b, c = vector_N[0] / mod, vector_N[1] / mod, vector_N[2] / mod
         else:
             a, b, c = vector_N[0], vector_N[1], vector_N[2]
         first_point = triangle[point]
         self.__a, self.__b, self.__c = a, b, c
         #  Вычисление коэффициента D
         self.__d = - self.__a * first_point[0] - self.__b * first_point[1] - self.__c * first_point[2]
-
 
     ###################
     #       0         # hight
@@ -140,10 +139,10 @@ class Plane:
         point4 = np.array([x4, y4, z4])
 
         matrix_x_y_z = self.full_vstack([point1, point2, point3, point4, point1]).T
-        logger.debug(matrix_x_y_z)
+        # logger.debug(matrix_x_y_z)
         points = np.array([[x1, y1, 0], [x2, y2, 0], [x3, y3, 0], [x4, y4, 0], [x1, y1, 0]])
         matrix_points = self.full_vstack(points).T
-        logger.debug(matrix_x_y_z)
+        # logger.debug(matrix_x_y_z)
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         ax.set_xlabel("X", fontsize=15, color='red')
@@ -243,6 +242,7 @@ class Triangle(Plane):
     Если np.shape(vertexes)[0] == 4, то 4я координата - вектор нормали
 
     """
+
     def __init__(self, vertexes, auto_create_normal=False):
         super().__init__()
         if np.shape(vertexes)[0] == 3 or auto_create_normal:
@@ -256,7 +256,7 @@ class Triangle(Plane):
             self.__vertex2 = np.array(vertexes[2])
             self.__vertex3 = np.array(vertexes[3])
             mod = np.linalg.norm(vertexes[0])
-            self.__normal = np.array(vertexes[0]/mod)
+            self.__normal = np.array(vertexes[0] / mod)
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
 
     @property
@@ -290,5 +290,115 @@ class Triangle(Plane):
     @normal.setter
     def normal(self, normal):
         self.__normal = normal
+
     def triangle_array(self):
         return np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3])
+
+
+class Sphere:
+    """
+    Класс сферы. Основано на уравнении (x-a)^2 + (y - b)^2 + (z - c)^2 = r^2
+    """
+
+    def __init__(self, r, a=0, b=0, c=0):
+        self.r = r
+        self.a = a
+        self.b = b
+        self.c = c
+
+
+class Polygon_2D:
+    def __init__(self, vertices: np.ndarray) -> None:
+        self.__vertices = vertices
+        self.__barycenter = np.array([])
+        self.__line_segments = []
+        self.set_barycenter()
+        self.line_segments_create()
+
+    @property
+    def barycenter(self):
+        return self.__barycenter
+
+    def get_closed_vartices(self):
+        return np.vstack([self.__vertices, self.__vertices[0]])
+
+    def line_segments_create(self):
+        for i, item in enumerate(self.__vertices):
+            segment = Line_segment()
+            if i == np.shape(self.__vertices)[0] - 1:
+                segment.segment_create_from_points(item, self.__vertices[0])
+
+            else:
+                segment.segment_create_from_points(item, self.__vertices[i + 1])
+            self.__line_segments = np.hstack([self.__line_segments, segment])
+
+    def get_line_segments(self):
+        return self.__line_segments
+
+    def set_barycenter(self):
+        arr = self.__vertices.T
+        xyz_mean = arr.mean(axis=1)
+        self.__barycenter = xyz_mean
+
+    def point_analyze(self, point: np.ndarray):
+        """
+        Функция принимает точку и проверяет, находится ли точка внутри границ многогранника путем подсчета числа
+        пересечений с границами многогранника.
+        :param point: np.ndarray
+        :return: bool
+        """
+        line = Line()
+        tets_point = np.array(self.__barycenter)
+        if point_comparison(point, self.barycenter):
+            tets_point += 1
+
+        line.line_create_from_points(point, tets_point)
+        arr = np.array([[0, 0, 0]])
+        for i, item in enumerate(self.__line_segments):
+            p = np.array(point_from_beam_segment_intersection(line, item))
+            if np.shape(p) == (3,):
+                arr = np.vstack([arr, p])
+        arr = arr[1:np.shape(arr)[0]]
+        if np.shape(point)[0] == 2:
+            point = np.hstack([point, 0])
+        arr = np.unique(arr, axis=0)
+        # logger.debug(arr)
+        idx = np.array([])
+        for i, item in enumerate(arr):
+            if point_comparison(item, point):
+                idx = np.hstack([idx, i])
+        if np.shape(idx)[0] != 0:
+            idx = idx.astype("int")
+            arr = np.delete(arr, idx, axis=0)
+        var = (np.shape(arr)[0]) % 2
+        if var == 0:
+            return False
+        else:
+            return True
+    def point_of_intersection(self, point: np.ndarray):
+        """
+               Функция принимает точку и возвращает точки пересечения луча с фигурой
+               :param point: np.ndarray
+               :return: bool
+               """
+        line = Line()
+        tets_point = np.array(self.__barycenter)
+        line.line_create_from_points(point, tets_point)
+        arr = np.array([[0, 0, 0]])
+        for i, item in enumerate(self.__line_segments):
+            p = np.array(point_from_beam_segment_intersection(line, item))
+            if np.shape(p) == (3,):
+                arr = np.vstack([arr, p])
+        arr = arr[1:np.shape(arr)[0]]
+        if np.shape(point)[0] == 2:
+            point = np.hstack([point, 0])
+        arr = np.unique(arr, axis=0)
+        idx = np.array([])
+        for i, item in enumerate(arr):
+            if point_comparison(item, point):
+                idx = np.hstack([idx, i])
+        if np.shape(idx)[0] != 0:
+            idx = idx.astype("int")
+            arr = np.delete(arr, idx, axis=0)
+        return arr
+
