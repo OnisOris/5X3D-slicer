@@ -5,13 +5,14 @@ from loguru import logger
 import numpy as np
 from numpy import ndarray, dtype
 
+
 # from threeDTool import *
 
 
 class Line:
     # Уравнение вида:
     # (x-a)/p1 = (y-b)/p2 = (z-c)/p3
-    def __init__(self, a=0, b=0, c=0, p1=0, p2=0, p3=0):
+    def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0):
         self.__a = a
         self.__b = b
         self.__c = c
@@ -78,20 +79,26 @@ class Line:
     # Принимает точку в виде массива 1x3 объекта класса numpy.array с тремя координатами [x, y, z]
     # point1 = [x1, y1, z1]
     def line_create_from_points(self, point1, point2) -> None:
-        '''
+        """
         Создает коэффициенты прямой по двум точкам в пространстве.
         Принимает точку в виде массива 1x3 объекта класса numpy.array с тремя координатами [x, y, z]
         :param point1: [x1, y1, z1]
         :param point2: [x2, y2, z2]
         :return: None
-        '''
+        """
+        if np.shape(point1)[0] == 2:
+            self.__c = 0
+            p3 = 0
+        else:
+            self.__c = point1[2]
+            p3 = point2[2] - point1[2]
         self.__a = point1[0]
         self.__b = point1[1]
-        self.__c = point1[2]
+
         # TODO: проверка на нуль
         p1 = point2[0] - point1[0]
         p2 = point2[1] - point1[1]
-        p3 = point2[2] - point1[2]
+
         if p1 == 0 and p2 == 0 and p3 == 0:
             logger.error("Создать линию из двух одинаковых точек нельзя")
         else:
@@ -182,11 +189,11 @@ class Line:
             return False
 
     def point_belongs_to_the_line(self, point):
-        '''
+        """
         Функция, определющая, принадлежит ли точка прямой
         :param point: список из координат [x, y, z]
         :return: True, если принадлежит, False, если не принадлежит
-        '''
+        """
         eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
         eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
         eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
@@ -195,20 +202,133 @@ class Line:
         else:
             return False
 
-class Line_segment(Line):
-    def __init__(self, a=0, b=0, c=0, p1=0, p2=0, p3=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0):
-        super().__init__(a, b, c, p1, p2, p3)
-        self.point1 = [x1, y1, z1]
-        self.point2 = [x2, y2, z2]
-        self.lenth = sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
+class Line_segment(Line):
+    def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0, point1=np.array([0, 0, 0]), point2=np.array([1, 0, 0])):
+        super().__init__(a, b, c, p1, p2, p3)
+        self.point1 = np.array(point1)
+        self.point2 = np.array(point2)
+        # Сортировка по возрастанию для удобства дальнейшей работы
+        self.border_x = np.array([point1[0], point2[0]])
+        self.border_y = np.array([point1[1], point2[1]])
+        self.border_z = np.array([point1[2], point2[2]])
+        self.border_x.sort()
+        self.border_y.sort()
+        self.border_z.sort()
+        self.lenth = np.linalg.norm(self.point1 - self.point2)
+
+    @property
+    def a(self):
+        return self.__a
+
+    @property
+    def b(self):
+        return self.__b
+
+    @property
+    def c(self):
+        return self.__c
+
+    @property
+    def p1(self):
+        return self.__p1
+
+    @property
+    def p2(self):
+        return self.__p2
+
+    @property
+    def p3(self):
+        return self.__p3
+
+    @a.setter
+    def a(self, a):
+        self.__a = a
+
+    @b.setter
+    def b(self, b):
+        self.__b = b
+
+    @c.setter
+    def c(self, c):
+        self.__c = c
+
+    @p1.setter
+    def p1(self, p1):
+        self.__p1 = p1
+
+    @p2.setter
+    def p2(self, p2):
+        self.__p2 = p2
+
+    @p3.setter
+    def p3(self, p3):
+        self.__p3 = p3
+
+    def info(self) -> None:
+        logger.debug(
+            f'a = {self.__a}, b = {self.__b}, c = {self.__c}, p1 = {self.__p1}, p2 = {self.__p2}, p3 = {self.__p3}'
+            f'\npoint1 = {self.point1}, point2 = {self.point2}')
+
+    def coeffs(self) -> ndarray:
+        return np.array([self.__a, self.__b, self.__c, self.__p1, self.__p2, self.__p3])
+
+    def segment_create_from_points(self, point1, point2) -> None:
+        """
+        Создает коэффициенты прямой по двум точкам в пространстве.
+        Принимает точку в виде массива 1x3 объекта класса numpy.array с тремя координатами [x, y, z]
+        :param point1: [x1, y1, z1]
+        :param point2: [x2, y2, z2]
+        :return: None
+        """
+        if np.shape(point1)[0] == 2:
+            self.__c = 0
+            p3 = 0
+        else:
+            self.__c = point1[2]
+            p3 = point2[2] - point1[2]
+        self.__a = point1[0]
+        self.__b = point1[1]
+
+        # TODO: проверка на нуль
+        p1 = point2[0] - point1[0]
+        p2 = point2[1] - point1[1]
+
+        if p1 == 0 and p2 == 0 and p3 == 0:
+            logger.error("Создать линию из двух одинаковых точек нельзя")
+        else:
+            mod_N = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
+            # Проверка на равенство длины вектора нормали единице
+            if mod_N != 1.0:
+                p1 = p1 / mod_N
+                p2 = p2 / mod_N
+                p3 = p3 / mod_N
+            self.p1 = p1
+            self.p2 = p2
+            self.p3 = p3
+        if np.shape(point1)[0] == 3:
+            self.point1 = point1
+            self.point2 = point2
+            self.border_x = np.array([point1[0], point2[0]])
+            self.border_y = np.array([point1[1], point2[1]])
+            self.border_z = np.array([point1[2], point2[2]])
+
+        else:
+            self.point1 = np.array([point1[0], point1[1], 0])
+            self.point2 = np.array([point2[0], point2[1], 0])
+            self.border_x = np.array([point1[0], point2[0]])
+            self.border_y = np.array([point1[1], point2[1]])
+            self.border_z = np.array([0, 0])
+        self.border_x.sort()
+        self.border_y.sort()
+        self.border_z.sort()
 
     def point_belongs_to_the_segment(self, point):
         eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
         eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
         eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
         if eq1 == 0 and eq2 == 0 and eq3 == 0:
-            if self.inorno(point[0]) and self.inorno(point[1] and self.inorno(point[2])):
+            if self.inorno(point):
                 return True
             else:
                 return False
@@ -216,15 +336,20 @@ class Line_segment(Line):
             return False
 
     def inorno(self, coordinate):
-        segment = [self.point1[0], self.point2[1]]
-        segment.sort()
-        if segment[0] <= coordinate <= segment[1] and segment[0] != segment[1]:
+        """
+        Функция проверяет, находится ли точка с прямой внутри заданного сегмента. Производится проверка на нулевой
+         отрезок, если отрезок состоит из двух одинаковых точек, то смысла искать точку в нулевом отрезке нет.
+        :param coordinate: [x, y, z]
+        :return: True - принадлежит отрезку, False - не принадлежит отрезку
+        """
+        if (self.border_x[0] <= coordinate[0] <= self.border_x[1] and self.border_y[0] <= coordinate[1] <=
+                self.border_y[1] and self.border_z[0] <= coordinate[2] <=
+                self.border_z[1]):
             return True
-        elif segment[0] == segment[1]:
+        elif self.point1[0] == self.point2[0] and self.point1[1] == self.point2[1] and self.point1[2] == self.point2[2]:
             logger.debug("Нулевой отрезок")
         else:
             return False
-
     # def lsftp(self, triangle, plane):
     #     '''
     #      Line segment from triangle and plane или сокращенно lsftp
@@ -233,3 +358,4 @@ class Line_segment(Line):
     #     pat = position_analyze_of_triangle(triangle.triangle_array())
     #     # if pat == 2:
     #     #     point1 = point_from_plane_line_intersection()
+
