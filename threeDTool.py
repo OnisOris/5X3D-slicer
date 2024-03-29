@@ -32,10 +32,6 @@ def check_position_lines(line1: Line, line2: Line) -> int:
         var = np.linalg.det(arr)
         if var == 0:
             cross = np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6]))
-            logger.debug(
-                f"np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6]) = {np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6])}, {line1.coeffs()[3:6]}, {line2.coeffs()[3:6]}  ")
-            logger.debug(
-                f"lINE1: p1 =  {line1.p1}, p2 = {line1.p2}, p3 = {line1.p3}, Line2 = p1 =  {line2.p1}, p2 = {line2.p2}, p3 = {line2.p3}, cross = {cross}")
             if cross == 0:
                 # прямые параллельны
                 return 1
@@ -56,8 +52,6 @@ def point_from_line_line_intersection(line1, line2, log=False):
     :return: ndarray([x, y, z])
     """
     # Проверка на принадлежность одной плоскости
-    line1.info()
-    line2.info()
     var = check_position_lines(line1, line2)
     if var == 2:
         if line1.coeffs()[3] == 0 and line1.coeffs()[4] == 0 and line1.coeffs()[5] == 0:
@@ -127,9 +121,6 @@ def point_from_beam_segment_intersection(beam, segment):
     :param segment:
     :return:
     """
-    logger.debug("------")
-    beam.info()
-    segment.info()
     point = point_from_line_line_intersection(beam, segment)
     if point.__class__ == False.__class__:
         return False

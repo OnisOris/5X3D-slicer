@@ -362,7 +362,6 @@ class Polygon_2D:
         if np.shape(point)[0] == 2:
             point = np.hstack([point, 0])
         arr = np.unique(arr, axis=0)
-        # logger.debug(arr)
         idx = np.array([])
         for i, item in enumerate(arr):
             if point_comparison(item, point):

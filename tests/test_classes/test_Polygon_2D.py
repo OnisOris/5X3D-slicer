@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from twoDTool import *
 from threeDTool import *
 import matplotlib.pyplot as plt
+plt.ion()
+
 
 # vert = np.array([[-5, 0], [1, 0], [0, 1]])
 # # vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
@@ -49,8 +51,8 @@ import matplotlib.pyplot as plt
 
 vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
 pol = Polygon_2D(vert)
-point = [3, 0]
-logger.debug(pol.point_analyze(point))
+point = [5, 0]
+# logger.debug(pol.point_analyze(point))
 
 V = vector_from_two_points(point, pol.barycenter)
 fig, ax = plt.subplots()
@@ -66,3 +68,4 @@ plt.ylabel("y")
 
 plt.grid()
 plt.show()
+plt.ion()
