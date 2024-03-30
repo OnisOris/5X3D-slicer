@@ -12,13 +12,14 @@ from numpy import ndarray, dtype
 class Line:
     # Уравнение вида:
     # (x-a)/p1 = (y-b)/p2 = (z-c)/p3
-    def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0):
+    def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0, logging=False):
         self.__a = a
         self.__b = b
         self.__c = c
         self.__p1 = p1
         self.__p2 = p2
         self.__p3 = p3
+        self.logging = logging
 
     @property
     def a(self):
@@ -100,7 +101,8 @@ class Line:
         p2 = point2[1] - point1[1]
 
         if p1 == 0 and p2 == 0 and p3 == 0:
-            logger.error("Создать линию из двух одинаковых точек нельзя")
+            if self.logging:
+                logger.error("Создать линию из двух одинаковых точек нельзя")
         else:
             mod_N = sqrt(p1 ** 2 + p2 ** 2 + p3 ** 2)
             # Проверка на равенство длины вектора нормали единице
