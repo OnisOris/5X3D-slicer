@@ -14,8 +14,8 @@ def check_position_lines(line1: Line, line2: Line) -> int:
     """
     :param line1:
     :param line2:
-    :return: 0 - если линии не компланарны, 1 - если прямые компланарны параллельны, 2 - если прямые компланарны и не параллельны
-    3, если линии совпадают
+    :return: 0 - если линии не компланарны, 1 - если прямые компланарны параллельны, 2 - если прямые компланарны и
+    не параллельны 3, если линии совпадают
     """
     cross = np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6]))
     if ((np.array_equal(line1.coeffs()[0:3], line2.coeffs()[0:3]) and
@@ -347,6 +347,8 @@ def point_comparison(point1, point2):
     :param point2:
     :return: bool
     """
+    point1 = np.round(point1, 7)
+    point2 = np.round(point2, 7)
     if np.shape(point1)[0] == 2:
         point1 = np.hstack([point1, 0])
     if np.shape(point2)[0] == 2:
@@ -354,4 +356,5 @@ def point_comparison(point1, point2):
     if point1[0] == point2[0] and point1[1] == point2[1] and point1[2] == point2[2]:
         return True
     else:
+        logger.debug(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]} and {point1[2]} == {point2[2]}")
         return False
