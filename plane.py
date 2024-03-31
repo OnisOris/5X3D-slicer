@@ -295,18 +295,6 @@ class Triangle(Plane):
         return np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3])
 
 
-class Sphere:
-    """
-    Класс сферы. Основано на уравнении (x-a)^2 + (y - b)^2 + (z - c)^2 = r^2
-    """
-
-    def __init__(self, r, a=0, b=0, c=0):
-        self.r = r
-        self.a = a
-        self.b = b
-        self.c = c
-
-
 class Polygon_2D:
     def __init__(self, vertices: np.ndarray) -> None:
         self.__vertices = vertices
