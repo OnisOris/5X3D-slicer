@@ -347,14 +347,22 @@ def point_comparison(point1, point2):
     :param point2:
     :return: bool
     """
-    point1 = np.round(point1, 7)
-    point2 = np.round(point2, 7)
+    # if np.round(point1[0], 5) == 2.66667:
+    #     logger.debug(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]}")
+    n = 7
+    point1 = np.round(point1, n)
+    point2 = np.round(point2, n)
+
     if np.shape(point1)[0] == 2:
         point1 = np.hstack([point1, 0])
     if np.shape(point2)[0] == 2:
         point2 = np.hstack([point2, 0])
     if point1[0] == point2[0] and point1[1] == point2[1] and point1[2] == point2[2]:
+        # if np.round(point1[0], 5) == 2.66667:
+        #     logger.error(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]} {point1[0] == point2[0]}")
         return True
     else:
-        logger.debug(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]} and {point1[2]} == {point2[2]}")
+
         return False
+
+#
