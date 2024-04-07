@@ -291,6 +291,11 @@ class Triangle(Plane):
     def normal(self, normal):
         self.__normal = normal
 
+    def get_vertexes(self):
+        return np.array([self.__vertex1, self.__vertex2, self.__vertex3])
+    def get_mean_vertexes(self):
+        return np.array([self.__vertex1, self.__vertex2, self.__vertex3]).mean(axis=1)
+
     def triangle_array(self):
         return np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3])
 
@@ -351,9 +356,12 @@ class Polygon_2D:
             point = np.hstack([point, 0])
         arr = np.unique(arr, axis=0)
         idx = np.array([])
+
         for i, item in enumerate(arr):
             if point_comparison(item, point):
+                # logger.debug(point_comparison(item, point))
                 idx = np.hstack([idx, i])
+        # logger.debug(idx)
         if np.shape(idx)[0] != 0:
             idx = idx.astype("int")
             arr = np.delete(arr, idx, axis=0)
@@ -374,16 +382,21 @@ class Polygon_2D:
         arr = np.array([[0, 0, 0]])
         for i, item in enumerate(self.__line_segments):
             p = np.array(point_from_beam_segment_intersection(line, item))
+            # logger.debug(p)
             if np.shape(p) == (3,):
                 arr = np.vstack([arr, p])
+                # logger.debug(p)
         arr = arr[1:np.shape(arr)[0]]
         if np.shape(point)[0] == 2:
             point = np.hstack([point, 0])
         arr = np.unique(arr, axis=0)
         idx = np.array([])
+        # logger.debug(arr)
         for i, item in enumerate(arr):
+            # logger.debug(f"item = {item} point = {point}")
             if point_comparison(item, point):
                 idx = np.hstack([idx, i])
+                # logger.debug(f"idx = {idx}")
         if np.shape(idx)[0] != 0:
             idx = idx.astype("int")
             arr = np.delete(arr, idx, axis=0)
