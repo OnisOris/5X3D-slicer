@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from twoDTool import *
 from threeDTool import *
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+# mpl.use('TkAgg')
+
+# mpl.use('Qt5Agg')
 
 vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
 pol = Polygon_2D(vert)
@@ -32,12 +36,14 @@ points = np.vstack([x_m, y_m])
 arr = np.array([0, 0])
 for i, item in enumerate(points.T):
     var = pol.point_analyze(item)
+    # if item[1] == 1.:
+    #     logger.debug(f"item = {item}, var = {var}")
     if var:
-        logger.error(np.shape(item))
+        # logger.error(item)
         arr = np.vstack([arr, item])
 arr = arr[1:np.shape(arr)[0]]
 
-logger.debug(arr)
+# logger.debug(arr)
 
 x_new = arr.T[0]
 y_new = arr.T[1]
