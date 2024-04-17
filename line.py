@@ -204,6 +204,18 @@ class Line:
         else:
             return False
 
+    def equation_y(self):
+        """
+        Данная функция возвращает коэффициенты k_1, b, k_2, c из уравнения y = k_1*x + b + k_2*z + c
+        :return:
+        """
+        return {"k_1": self.p2 / self.p1,
+                "k_2": self.p2 / self.p3,
+                "b": self.b - self.a * self.p2 / self.p1,
+                "c": self.c * self.p2 / self.p3
+
+                }
+
 
 class Line_segment(Line):
     def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0, point1=np.array([0, 0, 0]), point2=np.array([1, 0, 0])):
@@ -360,4 +372,3 @@ class Line_segment(Line):
     #     pat = position_analyze_of_triangle(triangle.triangle_array())
     #     # if pat == 2:
     #     #     point1 = point_from_plane_line_intersection()
-
