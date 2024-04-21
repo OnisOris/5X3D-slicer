@@ -213,8 +213,19 @@ class Line:
                 "k_2": self.p2 / self.p3,
                 "b": self.b - self.a * self.p2 / self.p1,
                 "c": self.c * self.p2 / self.p3
-
                 }
+
+    def show(self, ax):
+        p = self.coeffs()[3:6]
+        abc = self.coeffs()[0:3]
+        pabc = p * 15 + abc
+        pmabc = -p * 15 + abc
+        points = np.vstack([pabc, pmabc])
+        x = points.T[0]
+        y = points.T[1]
+        z = points.T[2]
+        ax.plot(x, y, z)
+
 
 
 class Line_segment(Line):
@@ -364,6 +375,12 @@ class Line_segment(Line):
             logger.debug("Нулевой отрезок")
         else:
             return False
+
+    def get_points(self):
+        return np.vstack([self.point1, self.point2])
+    def show(self, ax):
+        vT = self.get_points().T
+        ax.plot(vT[0], vT[1], vT[2])
     # def lsftp(self, triangle, plane):
     #     '''
     #      Line segment from triangle and plane или сокращенно lsftp
