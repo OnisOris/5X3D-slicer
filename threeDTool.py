@@ -116,7 +116,7 @@ def point_from_line_segment_intersection(line, segment):
 def point_from_beam_segment_intersection(beam, segment):
     """
     Функция возвращает точку пересечения луча и отрезка. Если луч ничего не пересекает, возвращается False.
-    В качестве
+    В качестве луча используется объект линии, где началом считается точка [a, b, c], а вектор направления [p1, p2, p3]
     :param beam: Line
     :param segment:
     :return:
@@ -126,6 +126,8 @@ def point_from_beam_segment_intersection(beam, segment):
         return False
     D = - beam.a * beam.p1 - beam.b * beam.p2
     var = beam.p1 * point[0] + beam.p2 * point[1] + D
+    D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
+    var = beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D
     if var >= 0:
         if point.__class__ != None.__class__:
             if segment.point_belongs_to_the_segment(point):
