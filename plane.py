@@ -245,6 +245,7 @@ class Triangle(Plane):
 
     def __init__(self, vertexes, auto_create_normal=False):
         super().__init__()
+        self.__line_segments = None
         if np.shape(vertexes)[0] == 3 or auto_create_normal:
             self.__vertex1 = np.array(vertexes[0])
             self.__vertex2 = np.array(vertexes[1])
@@ -258,6 +259,8 @@ class Triangle(Plane):
             mod = np.linalg.norm(vertexes[0])
             self.__normal = np.array(vertexes[0] / mod)
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
+        self.__barycenter = None
+
 
     @property
     def vertex1(self):
@@ -275,6 +278,10 @@ class Triangle(Plane):
     def normal(self):
         return self.__normal
 
+    @property
+    def barycenter(self):
+        return self.__barycenter
+
     @vertex1.setter
     def vertex1(self, vertex1):
         self.__vertex1 = vertex1
@@ -291,13 +298,92 @@ class Triangle(Plane):
     def normal(self, normal):
         self.__normal = normal
 
+    @barycenter.setter
+    def barycenter(self, barycenter):
+        self.__barycenter = barycenter
+
+    def set_barycenter(self):
+        arr = np.array([self.__vertex1,
+                        self.__vertex2,
+                        self.__vertex3])
+        xyz_mean = arr.mean(axis=0)
+        self.__barycenter = xyz_mean
+
+    def line_segments_create(self):
+        line1 = Line_segment()
+        line2 = Line_segment()
+        line3 = Line_segment()
+        line1.segment_create_from_points(self.__vertex1, self.__vertex2)
+        line2.segment_create_from_points(self.__vertex2, self.__vertex3)
+        line3.segment_create_from_points(self.__vertex3, self.__vertex1)
+        self.__line_segments = np.array([line1, line2, line3])
+
+    def show(self, ax) -> None:
+        vT = self.get_vertexes()
+        vT = np.vstack([vT, self.get_vertexes()[0]]).T
+        ax.plot(vT[0], vT[1], vT[2])
+
+
     def get_vertexes(self):
         return np.array([self.__vertex1, self.__vertex2, self.__vertex3])
     def get_mean_vertexes(self):
-        return np.array([self.__vertex1, self.__vertex2, self.__vertex3]).mean(axis=1)
+        return np.array([self.__vertex1, self.__vertex2, self.__vertex3]).mean(axis=0)
 
     def triangle_array(self):
         return np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3])
+
+    def point_analyze(self, point: np.ndarray):
+        """
+        Функция принимает точку и проверяет, находится ли точка внутри границ треугольника в трехмерном пространстве
+        путем подсчета числа
+        пересечений с границами треугольника.
+        :param point: np.ndarray
+        :return: bool
+        """
+
+        # проверка принадлежности точки плоскости треугольника.
+        print(np.round(point_in_plane(self, point), 10))
+        # print(point_in_plane(self, self.barycenter))
+        if np.round(point_in_plane(self, point), 10) == 0.0:
+            line = Line()
+            test_point = self.__vertex1
+            # if point_comparison(point, self.barycenter):
+            #     print("+1")
+            #     test_point += 0.1
+            # создание линии из оцениваемой точки в барицентр или в одну из вершин
+            line.line_create_from_points(point, test_point)
+            arr = np.array([[0, 0, 0]])
+            for i, item in enumerate(self.__line_segments):
+
+                p = np.array(point_from_beam_segment_intersection(line, item))
+
+                # logger.debug(p)
+                if np.shape(p) == (3,):
+                    arr = np.vstack([arr, p])
+            print(arr)
+            arr = arr[1:np.shape(arr)[0]]
+            logger.debug(arr)
+
+        # arr = arr[1:np.shape(arr)[0]]
+        # if np.shape(point)[0] == 2:
+        #     point = np.hstack([point, 0])
+        # arr = np.unique(arr, axis=0)
+        # idx = np.array([])
+
+        # for i, item in enumerate(arr):
+        #     if point_comparison(item, point):
+        #         # logger.debug(point_comparison(item, point))
+        #         idx = np.hstack([idx, i])
+        # # logger.debug(idx)
+        # if np.shape(idx)[0] != 0:
+        #     idx = idx.astype("int")
+        #     arr = np.delete(arr, idx, axis=0)
+        # var = (np.shape(arr)[0]) % 2
+        # if var == 0:
+        #     return False
+        # else:
+        #     return True
+
 
 
 class Polygon_2D:
