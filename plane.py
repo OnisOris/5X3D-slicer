@@ -342,47 +342,36 @@ class Triangle(Plane):
         """
 
         # проверка принадлежности точки плоскости треугольника.
-        print(np.round(point_in_plane(self, point), 10))
+        # print(np.round(point_in_plane(self, point), 10))
         # print(point_in_plane(self, self.barycenter))
         if np.round(point_in_plane(self, point), 10) == 0.0:
             line = Line()
-            test_point = self.__vertex1
-            # if point_comparison(point, self.barycenter):
-            #     print("+1")
-            #     test_point += 0.1
+            test_point = self.barycenter  #self.__vertex1
+            if point_comparison(point, self.barycenter):
+                test_point = self.vertex1
             # создание линии из оцениваемой точки в барицентр или в одну из вершин
             line.line_create_from_points(point, test_point)
             arr = np.array([[0, 0, 0]])
             for i, item in enumerate(self.__line_segments):
-
                 p = np.array(point_from_beam_segment_intersection(line, item))
-
-                # logger.debug(p)
                 if np.shape(p) == (3,):
                     arr = np.vstack([arr, p])
-            print(arr)
             arr = arr[1:np.shape(arr)[0]]
-            logger.debug(arr)
-
-        # arr = arr[1:np.shape(arr)[0]]
-        # if np.shape(point)[0] == 2:
-        #     point = np.hstack([point, 0])
-        # arr = np.unique(arr, axis=0)
-        # idx = np.array([])
-
-        # for i, item in enumerate(arr):
-        #     if point_comparison(item, point):
-        #         # logger.debug(point_comparison(item, point))
-        #         idx = np.hstack([idx, i])
-        # # logger.debug(idx)
-        # if np.shape(idx)[0] != 0:
-        #     idx = idx.astype("int")
-        #     arr = np.delete(arr, idx, axis=0)
-        # var = (np.shape(arr)[0]) % 2
-        # if var == 0:
-        #     return False
-        # else:
-        #     return True
+            arr = np.unique(arr, axis=0)
+            idx = np.array([])
+            for i, item in enumerate(arr):
+                if point_comparison(item, point):
+                    # logger.debug(point_comparison(item, point))
+                    idx = np.hstack([idx, i])
+            # logger.debug(idx)
+            if np.shape(idx)[0] != 0:
+                idx = idx.astype("int")
+                arr = np.delete(arr, idx, axis=0)
+            var = (np.shape(arr)[0]) % 2
+            if var == 0:
+                return False
+            else:
+                return True
 
 
 
