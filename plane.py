@@ -260,6 +260,8 @@ class Triangle(Plane):
             self.__normal = np.array(vertexes[0] / mod)
             self.create_plane_from_triangle(np.array([self.__normal, self.__vertex1, self.__vertex2, self.__vertex3]))
         self.__barycenter = None
+        self.set_barycenter()
+        self.line_segments_create()
 
 
     @property
@@ -372,6 +374,8 @@ class Triangle(Plane):
                 return False
             else:
                 return True
+        else:
+            return False
 
 
 

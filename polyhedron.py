@@ -5,7 +5,7 @@ from threeDTool import *
 class Polyhedron:
     def __init__(self, triangles):
         self.triangles = triangles
-        self.__barycenter = 0
+        self.__barycenter = None
         self.set_barycenter()
 
     def set_barycenter(self):
@@ -25,14 +25,15 @@ class Polyhedron:
     def point_analyze(self, point: np.ndarray):
         line = Line()
         # tets_point = np.array(self.__barycenter)
-        tets_point = np.array(self.__barycenter)
+        test_point = np.array(self.__barycenter)
         if point_comparison(point, self.barycenter):
-            tets_point += 1
-        line.line_create_from_points(point, tets_point)
-        line.info()
+            test_point += 0.001
+        line.line_create_from_points(point, test_point)
         arr = np.array([[0, 0, 0]])
         for i, item in enumerate(self.triangles):
-            p = np.array(point_from_beam_segment_intersection(line, item))
+            p = line_triangle_intersection(line, item)
+            # p = np.array(point_from_beam_segment_intersection(line, item))
             if np.shape(p) == (3,):
                 arr = np.vstack([arr, p])
         arr = arr[1:np.shape(arr)[0]]
+        logger.debug(arr)

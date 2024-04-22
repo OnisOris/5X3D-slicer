@@ -15,6 +15,5 @@ for item in triangles:
 
 polyhedron = Polyhedron(tr)
 
-print(polyhedron.barycenter)
-point = np.array([0.5, 0.5, 0.5])
+point = np.array([0.1, 0, 0])
 polyhedron.point_analyze(point)

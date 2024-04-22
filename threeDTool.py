@@ -2,7 +2,6 @@
 from typing import Tuple, Any
 
 from numpy import ndarray, dtype
-
 from line import Line
 import numpy as np
 from loguru import logger
@@ -17,7 +16,7 @@ def check_position_lines(line1: Line, line2: Line) -> int:
     :return: 0 - если линии не компланарны, 1 - если прямые компланарны параллельны, 2 - если прямые компланарны и
     не параллельны 3, если линии совпадают
     """
-    cross = np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6]))
+    cross = np.round(np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6])), 8)
     if ((np.array_equal(line1.coeffs()[0:3], line2.coeffs()[0:3]) and
          np.linalg.matrix_rank(np.array([line1.coeffs()[3:6], line2.coeffs()[3:6], line2.coeffs()[3:6]])) == 2)
             and cross == 0):
@@ -29,9 +28,9 @@ def check_position_lines(line1: Line, line2: Line) -> int:
         arr = np.array([line3.coeffs()[3:6],
                         line1.coeffs()[3:6],
                         line2.coeffs()[3:6]])
-        var = np.linalg.det(arr)
+        var = np.round(np.linalg.det(arr), 8)
+
         if var == 0:
-            cross = np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6]))
             if cross == 0:
                 # прямые параллельны
                 return 1
@@ -124,8 +123,6 @@ def point_from_beam_segment_intersection(beam, segment):
     point = point_from_line_line_intersection(beam, segment)
     if point.__class__ == False.__class__:
         return False
-    D = - beam.a * beam.p1 - beam.b * beam.p2
-    var = beam.p1 * point[0] + beam.p2 * point[1] + D
     D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
     var = beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D
     if var >= 0:
@@ -352,6 +349,8 @@ def point_comparison(point1, point2):
     # if np.round(point1[0], 5) == 2.66667:
     #     logger.debug(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]}")
     n = 7
+    # if point1 is None or point2 is None:
+    #     return False
     point1 = np.round(point1, n)
     point2 = np.round(point2, n)
 
@@ -360,11 +359,18 @@ def point_comparison(point1, point2):
     if np.shape(point2)[0] == 2:
         point2 = np.hstack([point2, 0])
     if point1[0] == point2[0] and point1[1] == point2[1] and point1[2] == point2[2]:
-        # if np.round(point1[0], 5) == 2.66667:
-        #     logger.error(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]} {point1[0] == point2[0]}")
         return True
     else:
-
         return False
 
-#
+
+def line_triangle_intersection(line: Line, triangle):
+    point = point_from_plane_line_intersection(line, triangle)
+    logger.debug(point)
+    if point is not None:
+        if triangle.point_analyze(point):
+            return point
+        else:
+            return False
+    else:
+        return False
