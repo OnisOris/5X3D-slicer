@@ -16,7 +16,7 @@ def check_position_lines(line1: Line, line2: Line) -> int:
     :return: 0 - если линии не компланарны, 1 - если прямые компланарны параллельны, 2 - если прямые компланарны и
     не параллельны 3, если линии совпадают
     """
-    cross = np.round(np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6])), 8)
+    cross = np.round(np.linalg.norm(np.cross(line1.coeffs()[3:6], line2.coeffs()[3:6])), 6)
     if ((np.array_equal(line1.coeffs()[0:3], line2.coeffs()[0:3]) and
          np.linalg.matrix_rank(np.array([line1.coeffs()[3:6], line2.coeffs()[3:6], line2.coeffs()[3:6]])) == 2)
             and cross == 0):
@@ -28,7 +28,7 @@ def check_position_lines(line1: Line, line2: Line) -> int:
         arr = np.array([line3.coeffs()[3:6],
                         line1.coeffs()[3:6],
                         line2.coeffs()[3:6]])
-        var = np.round(np.linalg.det(arr), 8)
+        var = np.round(np.linalg.det(arr), 6)
 
         if var == 0:
             if cross == 0:
@@ -72,7 +72,7 @@ def point_from_line_line_intersection(line1, line2, log=False):
         x = t * line2.p1 + line2.a
         y = t * line2.p2 + line2.b
         z = t * line2.p3 + line2.c
-        return np.array([x, y, z])
+        return np.round(np.array([x, y, z]), 8)
     else:
         if log:
             logger.error("Прямые не пересекаются, либо совпадают")
@@ -95,7 +95,7 @@ def point_from_plane_line_intersection(line, plane) -> np.ndarray or None:
         x = t * line.p1 + line.a
         y = t * line.p2 + line.b
         z = t * line.p3 + line.c
-        return np.array([x, y, z])
+        return np.round(np.array([x, y, z]), 8)
     else:
         logger.debug("Прямая параллельная плоскости")
         return None
@@ -121,10 +121,11 @@ def point_from_beam_segment_intersection(beam, segment):
     :return:
     """
     point = point_from_line_line_intersection(beam, segment)
+
     if point.__class__ == False.__class__:
         return False
     D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
-    var = beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D
+    var = np.round(beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D, 8)
     if var >= 0:
         if point.__class__ != None.__class__:
             if segment.point_belongs_to_the_segment(point):
@@ -183,7 +184,7 @@ def position_analyzer_of_point_and_plane(point, plane) -> int:
     :param plane:
     :return: 1, 0, -1
     """
-    var = point_in_plane(plane, point)  # plane.a * point[0] + plane.b * point[1] + plane.c * point[2] + plane.d
+    var = np.round(point_in_plane(plane, point), 8)  # plane.a * point[0] + plane.b * point[1] + plane.c * point[2] + plane.d
     if var > 0:
         return 1
     if var < 0:
@@ -346,8 +347,6 @@ def point_comparison(point1, point2):
     :param point2:
     :return: bool
     """
-    # if np.round(point1[0], 5) == 2.66667:
-    #     logger.debug(f"{point1[0]} == {point2[0]} and {point1[1]} == {point2[1]}")
     n = 7
     # if point1 is None or point2 is None:
     #     return False
@@ -367,6 +366,14 @@ def point_comparison(point1, point2):
 def line_triangle_intersection(line: Line, triangle):
     point = point_from_plane_line_intersection(line, triangle)
     logger.debug(point)
+    logger.debug(triangle.get_vertexes())
+    from display import Dspl
+    try:
+        po = Points(point)
+        dp = Dspl([line, triangle, po])
+        dp.show()
+    except AttributeError:
+        print("AttributeError")
     if point is not None:
         if triangle.point_analyze(point):
             return point
@@ -374,3 +381,60 @@ def line_triangle_intersection(line: Line, triangle):
             return False
     else:
         return False
+    # 26
+    # [[-2.628688  8.090116  5.257376]
+    #  [-7.236073  5.257253  4.472195]
+    # [-4.253227
+    # 3.090114
+    # 8.506542]]
+def beam_triangle_intersection(beam: Line, triangle):
+    point = line_triangle_intersection(beam, triangle)
+    # logger.debug(point)
+    # from display import Dspl
+    # try:
+    #     po = Points(point)
+    #     dp = Dspl([beam, triangle, po])
+    #     dp.show()
+    # except AttributeError:
+    #     print("AttributeError")
+    if point is not None and point is not False:
+        D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
+        var = beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D
+        if var >= 0:
+            return point
+        else:
+            return None
+    else:
+        return None
+def loxodrome(angle=0, R = 70, count_of_rot=17, step=0.0025):
+    v_angle_unit = np.pi / R / 2
+    h_angle_unit = np.pi / R * count_of_rot * step
+    xr = angle / 180 * np.pi
+    xrc = np.cos(xr)
+    xrs = np.sin(xr)
+    total_rot = 0
+    arr = np.array([0, 0, 0])
+    i = -R
+    while i <= R:
+        x = np.cos(i * v_angle_unit) * R
+        y = np.sin(i * v_angle_unit) * R
+        v = [x * np.cos(total_rot), y, x * np.sin(total_rot)]
+        pnt_y = v[1] * xrc - v[2] * xrs
+        pnt_z = v[2] * xrc + v[1] * xrs
+        arr = np.vstack([arr, [v[0], pnt_y, pnt_z]])
+        total_rot += h_angle_unit
+        i += step
+    arr = arr[1:np.shape(arr)[0]]
+    return arr
+
+class Points:
+    def __init__(self, xyz: np.ndarray[:, 3], color='green', s=10, marker='o'):
+        self.xyz = np.array(xyz)
+        self.color = color
+        self.s = s
+        self.marker = marker
+
+    def show(self, ax):
+        xyz_T = self.xyz.T
+        ax.scatter(xyz_T[0], xyz_T[1], xyz_T[2], color=self.color, s=self.s, marker=self.marker)
+
