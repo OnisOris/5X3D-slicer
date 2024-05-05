@@ -1,14 +1,6 @@
 from plane import Polygon_2D
-import numpy as np
-from loguru import logger
-import matplotlib.pyplot as plt
-from twoDTool import *
 from threeDTool import *
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-# mpl.use('TkAgg')
-
-# mpl.use('Qt5Agg')
 
 vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
 pol = Polygon_2D(vert)
@@ -19,8 +11,8 @@ min_x = vert.T[0].min()
 max_y = vert.T[1].max()
 min_y = vert.T[1].min()
 
-x = np.linspace(min_x, max_x, 10)
-y = np.linspace(min_y, max_y, 10)
+x = np.linspace(min_x, max_x, 8)
+y = np.linspace(min_y, max_y, 8)
 
 
 x_m, y_m = np.meshgrid(x, y)
@@ -36,14 +28,9 @@ points = np.vstack([x_m, y_m])
 arr = np.array([0, 0])
 for i, item in enumerate(points.T):
     var = pol.point_analyze(item)
-    # if item[1] == 1.:
-    #     logger.debug(f"item = {item}, var = {var}")
     if var:
-        # logger.error(item)
         arr = np.vstack([arr, item])
 arr = arr[1:np.shape(arr)[0]]
-
-# logger.debug(arr)
 
 x_new = arr.T[0]
 y_new = arr.T[1]
