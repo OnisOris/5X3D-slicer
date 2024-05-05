@@ -59,14 +59,14 @@ def slicing(triangles, thiсk=0.1):
                     points.append(point3)
         slice_plane.d -= 0.1
     points = np.array(points)
-    u, idx = np.unique(points, axis=0, return_index=True)
-    points = u[idx.argsort()]
+    # u, idx = np.unique(points, axis=0, return_index=True)
+    # points = u[idx.argsort()]
     logger.debug(points)
     return points.T
 
-points = slicing(triangles)
+points_new = slicing(triangles)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(points[0], points[1], points[2])
+ax.scatter(points_new[0], points_new[1], points_new[2])
 plt.show()

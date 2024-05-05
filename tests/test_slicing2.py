@@ -6,11 +6,16 @@ from line import Line, Line_segment
 from plane import Plane, Triangle
 from parser_stl import Parser_stl
 from threeDTool import *
+import matplotlib as mpl
+# mpl.use('TkAgg')
 
-path = "../test_models/cube.stl"
+mpl.use('Qt5Agg')
+
+path = "C:/Users\mixai\OneDrive - ITMO UNIVERSITY\code/5X3D-slicer/test_models/cube.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
+file.close()
 
 def slicing(triangles, thiсk=0.1):
     # Находим пограничные координаты модели:
@@ -30,7 +35,10 @@ def slicing(triangles, thiсk=0.1):
     for _ in range(int(amount_of_layers)):
         # Пройдемся по всем треугольникам
         for triangle in triangles:
-            position_index, points = position_analyze_of_triangle(triangle, slice_plane)
+            try:
+                position_index, points = position_analyze_of_triangle(triangle, slice_plane)
+            except TypeError:
+                logger.error(f"error")
             # logger.debug(position_index)
             if position_index == 2:
                 # Создаем плоскость треугольника
@@ -64,4 +72,10 @@ points = slicing(triangles)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(points[0], points[1], points[2])
+# plt.xlabel("x")
+# plt.ylabel("y")
+# plt.zlabel("y")
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
 plt.show()
