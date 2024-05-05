@@ -196,9 +196,9 @@ class Line:
         :param point: список из координат [x, y, z]
         :return: True, если принадлежит, False, если не принадлежит
         """
-        eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
-        eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
-        eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
+        eq1 = np.round(self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b), 8)
+        eq2 = np.round(self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c), 8)
+        eq3 = np.round(self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a), 8)
         if eq1 == 0 and eq2 == 0 and eq3 == 0:
             return True
         else:
@@ -229,7 +229,12 @@ class Line:
 
 
 class Line_segment(Line):
-    def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0, point1=np.array([0, 0, 0]), point2=np.array([1, 0, 0])):
+    def __init__(self, a=0, b=0, c=0, p1=1, p2=0, p3=0, point1=None, point2=None):
+        if point1 is not None and point2 is not None:
+            self.segment_create_from_points(point1, point2)
+        else:
+            point1 = np.array([0, 0, 0])
+            point2 = np.array([1, 0, 0])
         super().__init__(a, b, c, p1, p2, p3)
         self.point1 = np.array(point1)
         self.point2 = np.array(point2)
@@ -244,6 +249,7 @@ class Line_segment(Line):
 
     @property
     def a(self):
+        logger.debug(self.__a)
         return self.__a
 
     @property
@@ -349,10 +355,7 @@ class Line_segment(Line):
         self.border_z.sort()
 
     def point_belongs_to_the_segment(self, point):
-        eq1 = self.p2 * self.p3 * (point[0] - self.a) - self.p1 * self.p3 * (point[1] - self.b)
-        eq2 = self.p1 * self.p3 * (point[1] - self.b) - self.p1 * self.p2 * (point[2] - self.c)
-        eq3 = self.p1 * self.p2 * (point[2] - self.c) - self.p2 * self.p3 * (point[0] - self.a)
-        if eq1 == 0 and eq2 == 0 and eq3 == 0:
+        if self.point_belongs_to_the_line(point):
             if self.inorno(point):
                 return True
             else:
@@ -380,7 +383,7 @@ class Line_segment(Line):
         return np.vstack([self.point1, self.point2])
     def show(self, ax):
         vT = self.get_points().T
-        ax.plot(vT[0], vT[1], vT[2])
+        ax.plot(vT[0], vT[1], vT[2], 'm')
     # def lsftp(self, triangle, plane):
     #     '''
     #      Line segment from triangle and plane или сокращенно lsftp
