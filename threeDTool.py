@@ -2,11 +2,13 @@
 from typing import Tuple, Any
 
 from numpy import ndarray, dtype
-from line import Line
+from line import Line, Line_segment
 import numpy as np
 from loguru import logger
 from math import sqrt
 from twoDTool import *
+from typing import Optional
+from curve import Curve
 
 
 def check_position_lines(line1: Line, line2: Line) -> int:
@@ -53,15 +55,17 @@ def point_from_line_line_intersection(line1, line2, log=False):
     # Проверка на принадлежность одной плоскости
     var = check_position_lines(line1, line2)
     if var == 2:
-        if line1.coeffs()[3] == 0 and line1.coeffs()[4] == 0 and line1.coeffs()[5] == 0:
+        if np.allclose(line1.coeffs()[3:6], 0, atol=1e-8):
+        # if line1.coeffs()[3] == 0 and line1.coeffs()[4] == 0 and line1.coeffs()[5] == 0:
             return None
-        elif line2.coeffs()[3] == 0 and line2.coeffs()[4] == 0 and line2.coeffs()[5] == 0:
+        elif np.allclose(line2.coeffs()[3:6], 0, atol=1e-8):
+        # elif line2.coeffs()[3] == 0 and line2.coeffs()[4] == 0 and line2.coeffs()[5] == 0:
             return None
-        if line2.p1 * line1.p3 != line2.p3 * line1.p1:
+        if not np.allclose(line2.p1 * line1.p3, line2.p3 * line1.p1, atol=1e-8):
             # t_2^x
             t = ((line1.a * line1.p3 - line2.a * line1.p3 + line2.c * line1.p1 - line1.c * line1.p1) /
                  (line2.p1 * line1.p3 - line2.p3 * line1.p1))
-        elif line2.p2 * line1.p3 != line2.p3 * line1.p2:
+        elif not np.allclose(line2.p2 * line1.p3, line2.p3 * line1.p2, atol=1e-8):
             # t_2^y
             t = ((line1.b * line1.p3 - line2.b * line1.p3 + line1.p2 * line2.c - line1.p2 * line1.c) /
                  (line2.p2 * line1.p3 - line2.p3 * line1.p2))
@@ -72,14 +76,14 @@ def point_from_line_line_intersection(line1, line2, log=False):
         x = t * line2.p1 + line2.a
         y = t * line2.p2 + line2.b
         z = t * line2.p3 + line2.c
-        return np.round(np.array([x, y, z]), 8)
+        return np.round(np.array([x, y, z]), 18)
     else:
         if log:
             logger.error("Прямые не пересекаются, либо совпадают")
         return False
 
 
-def point_from_plane_line_intersection(line, plane) -> np.ndarray or None:
+def point_from_plane_line_intersection(line, plane) -> Optional[np.ndarray]:
     """
     Функция находит координаты точки пересечения линии line и плоскости plane.
     :param line:
@@ -90,12 +94,45 @@ def point_from_plane_line_intersection(line, plane) -> np.ndarray or None:
     vector_n = np.array([plane.a, plane.b, plane.c])
     vector_line = np.array([line.p1, line.p2, line.p3])
     if np.dot(vector_n, vector_line) != 0:
-        t = -(plane.a * line.a + plane.b * line.b + plane.c * line.c + plane.d) / (
+        line_abc = line.coeffs()[0:3]
+        # t = -(plane.a * line.a + plane.b * line.b + plane.c * line.c + plane.d) / (
+        #         plane.a * line.p1 + plane.b * line.p2 + plane.c * line.p3)
+        # t2 = -np.sum(line_abc.dot(vector_n), plane.d) / vector_n.dot(vector_line)
+        t = - np.sum([line_abc.dot(vector_n), plane.d]) / vector_n.dot(vector_line)
+        #
+        # x = t * line.p1 + line.a
+        # y = t * line.p2 + line.b
+        # z = t * line.p3 + line.c
+        arr = np.sum([vector_line.dot(t), line_abc], axis=0)
+
+        # return np.round(np.array([x, y, z]), 6)
+        return arr
+    else:
+        logger.debug("Прямая параллельная плоскости")
+        return None
+
+def test_point_from_plane_line_intersection(line, plane) -> Optional[np.ndarray]:
+    """
+    Функция находит координаты точки пересечения линии line и плоскости plane.
+    :param line:
+    :param plane:
+    :return: [x, y, z] or None
+    """
+    # Проверка на параллельность линии плоскости
+    vector_n = np.array([plane.a, plane.b, plane.c])
+    vector_line = np.array([line.p1, line.p2, line.p3])
+    if np.dot(vector_n, vector_line) != 0:
+        line_abc = line.coeffs()[0:3]
+
+        t = - (plane.a * line.a + plane.b * line.b + plane.c * line.c + plane.d) / (
                 plane.a * line.p1 + plane.b * line.p2 + plane.c * line.p3)
+        t = - (np.sum(line_abc.dot(vector_n)), plane.d) / vector_n.dot(vector_line)
+
         x = t * line.p1 + line.a
         y = t * line.p2 + line.b
         z = t * line.p3 + line.c
-        return np.round(np.array([x, y, z]), 8)
+
+        return np.round(np.array([x, y, z]), 6)
     else:
         logger.debug("Прямая параллельная плоскости")
         return None
@@ -124,9 +161,12 @@ def point_from_beam_segment_intersection(beam, segment):
 
     if point.__class__ == False.__class__:
         return False
-    D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
-    var = np.round(beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D, 8)
-    if var >= 0:
+    D = - beam.coeffs()[0:3].dot(beam.coeffs()[3:6])
+    # D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
+    # var = np.round(beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D, 8)
+    # logger.debug(beam.coeffs)
+    var = np.sum([beam.coeffs()[3:6].dot(point), D])
+    if var >= 0 or np.allclose(var, 0, atol=1e-8):
         if point.__class__ != None.__class__:
             if segment.point_belongs_to_the_segment(point):
                 return point
@@ -136,6 +176,17 @@ def point_from_beam_segment_intersection(beam, segment):
             return False
     else:
         return False
+
+def point_from_segment_segment_intersection(segment1, segment2):
+    point = point_from_line_line_intersection(segment1, segment2)
+    logger.debug(point)
+    if isinstance(point, ndarray):
+        if segment1.point_belongs_to_the_segment(point) and segment2.point_belongs_to_the_segment(point):
+            return point
+        else:
+            return None
+    else:
+        return None
 
 
 def perpendicular_line(line, left=False):
@@ -242,6 +293,7 @@ def position_analyze_of_triangle(triangle, plane) -> tuple[int, None] | tuple[in
     p1 = point_in_plane(plane, point1)
     p2 = point_in_plane(plane, point2)
     p3 = point_in_plane(plane, point3)
+    # a = np.allclose(p2, 0, atol=1e-6)
     if var1 == 1 and var2 == 1 and var3 == 1:
         return 1, None
     elif var1 == -1 and var2 == -1 and var3 == -1:
@@ -253,7 +305,7 @@ def position_analyze_of_triangle(triangle, plane) -> tuple[int, None] | tuple[in
             or var1 == 1 and var2 == 1 and var3 == 0 or var1 == -1 and var2 == -1 and var3 == 0:
         if p1 == 0:
             return -2, point1
-        elif p2 == 0:
+        elif np.allclose(p2, 0, atol=1e-5):
             return -2, point2
         elif p3 == 0:
             return -2, point3
@@ -357,7 +409,7 @@ def point_comparison(point1, point2):
         point1 = np.hstack([point1, 0])
     if np.shape(point2)[0] == 2:
         point2 = np.hstack([point2, 0])
-    if point1[0] == point2[0] and point1[1] == point2[1] and point1[2] == point2[2]:
+    if np.allclose(point1, point2, atol=1e-6):
         return True
     else:
         return False
@@ -365,15 +417,15 @@ def point_comparison(point1, point2):
 
 def line_triangle_intersection(line: Line, triangle):
     point = point_from_plane_line_intersection(line, triangle)
-    logger.debug(point)
-    logger.debug(triangle.get_vertexes())
-    from display import Dspl
-    try:
-        po = Points(point)
-        dp = Dspl([line, triangle, po])
-        dp.show()
-    except AttributeError:
-        print("AttributeError")
+    # logger.debug(point)
+    # logger.debug(triangle.get_vertexes())
+    # from display import Dspl
+    # try:
+    #     po = Points(point)
+    #     dp = Dspl([line, triangle, po])
+    #     dp.show()
+    # except AttributeError:
+    #     print("AttributeError")
     if point is not None:
         if triangle.point_analyze(point):
             return point
@@ -397,16 +449,21 @@ def beam_triangle_intersection(beam: Line, triangle):
     #     dp.show()
     # except AttributeError:
     #     print("AttributeError")
+    # except IndexError:
+    #     print("IndexError")
     if point is not None and point is not False:
-        D = - beam.a * beam.p1 - beam.b * beam.p2 - beam.c * beam.p3
-        var = beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D
+        beam_abc = beam.coeffs()[0:3]
+        beam_p = beam.coeffs()[3:6]
+        D = - beam_abc.dot(beam_p)
+        # var = beam.p1 * point[0] + beam.p2 * point[1] + beam.p3 * point[2] + D
+        var = np.sum([beam_p.dot(point), D])
         if var >= 0:
             return point
         else:
             return None
     else:
         return None
-def loxodrome(angle=0, R = 70, count_of_rot=17, step=0.0025):
+def loxodrome(angle=0, R = 70, count_of_rot=17, step=0.0025, point_n=np.array([0, 0, 0])):
     v_angle_unit = np.pi / R / 2
     h_angle_unit = np.pi / R * count_of_rot * step
     xr = angle / 180 * np.pi
@@ -424,8 +481,51 @@ def loxodrome(angle=0, R = 70, count_of_rot=17, step=0.0025):
         arr = np.vstack([arr, [v[0], pnt_y, pnt_z]])
         total_rot += h_angle_unit
         i += step
+    if arr.shape != (3, ):
+        arr = arr[1:np.shape(arr)[0]]
+    return arr + point_n
+def generate_loxodromes(r=10, layer_height=1, point_n=np.array([0, 0, 0])):
+    r_c = 2
+    count_of_layer = r/layer_height - r_c/layer_height
+    step = (r-r_c)/count_of_layer
+    curves = np.array([])
+    for i in range(int(count_of_layer)):
+        curves = np.hstack([curves, Curve(loxodrome(R=r-i*step, angle=90, count_of_rot=17, step=0.0025, point_n=point_n))])
+    return curves
+
+def trajectory_generate(h=10, line_width=1, point_n=np.array([0, 0, 0])):
+    v = np.array([])
+    count = range(int(h/line_width))
+    for i in count:
+        j = i*line_width
+        v = np.hstack([v, j, j, -j, -j])
+        if i == np.shape(count)[0]-1:
+            v = np.hstack([v, -j, j])
+    x = v[2:-1]
+    y = v[3:]
+
+    return np.vstack([x, y, np.zeros(np.shape(x)[0])])
+
+def line_segments_array_create_from_points(points):
+    arr = np.array([])
+    for i, point in enumerate(points):
+        if i == np.shape(points)[0]-1:
+            break
+        arr = np.hstack([arr, Line_segment(point1=point, point2=points[i+1])])
     arr = arr[1:np.shape(arr)[0]]
     return arr
+
+def trajectories_intersection_create(polygon, trajectories):
+    points = np.array([0, 0, 0])
+    for i, item in enumerate(trajectories):
+        for segment in polygon.get_line_segments():
+            p = point_from_segment_segment_intersection(item, segment)
+            if isinstance(p, ndarray):
+                logger.debug(p)
+                points = np.vstack([points, p])
+    points = points[1:np.shape(points)[0]]
+    return points
+
 
 class Points:
     def __init__(self, xyz: np.ndarray[:, 3], color='green', s=10, marker='o'):
