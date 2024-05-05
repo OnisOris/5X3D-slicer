@@ -5,8 +5,12 @@ import matplotlib.pyplot as plt
 from twoDTool import *
 from threeDTool import *
 import matplotlib.pyplot as plt
-plt.ion()
+import matplotlib as mpl
 
+# mpl.use('TkAgg')
+
+# mpl.use('Qt5Agg')
+# mpl.use('Agg')
 
 # vert = np.array([[-5, 0], [1, 0], [0, 1]])
 # # vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
@@ -52,7 +56,10 @@ plt.ion()
 vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
 pol = Polygon_2D(vert)
 point = [5, 0]
-# logger.debug(pol.point_analyze(point))
+point = [1.3, 3]
+
+logger.debug(pol.point_analyze(point))
+logger.debug(pol.point_of_intersection(point))
 
 V = vector_from_two_points(point, pol.barycenter)
 fig, ax = plt.subplots()
@@ -62,10 +69,9 @@ for item in pol.point_of_intersection(point):
     plt.scatter(item[0], item[1], color='green', s=40, marker='o')
 plt.plot(pol.get_closed_vartices().T[0], pol.get_closed_vartices().T[1])
 plt.legend(('Вектор луча', 'Барицентр', 'Точка(и) пересечения луча с фигурой'))
-plt.title("Многоугольник")
+plt.title("")
 plt.xlabel("x")
 plt.ylabel("y")
 
 plt.grid()
 plt.show()
-plt.ion()
