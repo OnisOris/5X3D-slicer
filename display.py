@@ -26,7 +26,6 @@ class Dspl:
     def show(self):
         for obj in self.input_array:
             obj.show(self.ax)
-        # self.ax.plot(x, y, z)
         plt.show()
 
 
