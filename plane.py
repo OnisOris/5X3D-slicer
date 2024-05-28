@@ -418,6 +418,11 @@ class Polygon:
         arr = self.__vertices.T
         xyz_mean = arr.mean(axis=1)
         self.__barycenter = xyz_mean
+    def show(self, ax) -> None:
+        for segment in self.__line_segments:
+            segment.color = 'green'
+            segment.show(ax)
+
 
     def point_analyze(self, point: np.ndarray):
         """
