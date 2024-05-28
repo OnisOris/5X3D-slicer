@@ -40,7 +40,7 @@ def loxo_create(arr0, path):
     return arr
 
 
-path = "C:/Users\mixai\OneDrive - ITMO UNIVERSITY\code/5X3D-slicer/test_models/MeshBody2.stl"
+path = "C:/Users\mixai\OneDrive - ITMO UNIVERSITY\code/5X3D-slicer/test_models/cube.stl"
 # your_mesh = trimesh.load_mesh(path)
 
 
@@ -60,7 +60,8 @@ polyhedron = Polyhedron(tr)
 # вычисление радиуса
 r = np.array([np.linalg.norm(polyhedron.get_min_max()[0]), np.linalg.norm(polyhedron.get_min_max()[1])])
 rmax = np.max(r)/2
-arr = generate_loxodromes(r=rmax, point_n=polyhedron.get_median_point())
+point_n = polyhedron.get_median_point()
+arr = generate_loxodromes(r=rmax, point_n=point_n)
 f_lox = arr[0]
 for i, item in enumerate(arr):
     if i == np.shape(arr)[0] - 1:
