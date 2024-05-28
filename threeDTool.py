@@ -1,7 +1,10 @@
 # from plane import Plane
 from typing import Tuple, Any
 
+from fontTools.misc import vector
 from numpy import ndarray, dtype
+
+from DH_config import DH
 from line import Line, Line_segment
 import numpy as np
 from loguru import logger
@@ -179,7 +182,6 @@ def point_from_beam_segment_intersection(beam, segment):
 
 def point_from_segment_segment_intersection(segment1, segment2):
     point = point_from_line_line_intersection(segment1, segment2)
-    logger.debug(point)
     if isinstance(point, ndarray):
         if segment1.point_belongs_to_the_segment(point) and segment2.point_belongs_to_the_segment(point):
             return point
@@ -484,14 +486,55 @@ def loxodrome(angle=0, R = 70, count_of_rot=17, step=0.0025, point_n=np.array([0
     if arr.shape != (3, ):
         arr = arr[1:np.shape(arr)[0]]
     return arr + point_n
-def generate_loxodromes(r=10, layer_height=1, point_n=np.array([0, 0, 0])):
-    r_c = 2
+def generate_loxodromes(r=10, r_c=0, layer_height=0.2, point_n=np.array([0, 0, 0]), steps=0.0025):
     count_of_layer = r/layer_height - r_c/layer_height
     step = (r-r_c)/count_of_layer
     curves = np.array([])
     for i in range(int(count_of_layer)):
-        curves = np.hstack([curves, Curve(loxodrome(R=r-i*step, angle=90, count_of_rot=17, step=0.0025, point_n=point_n))])
+        curves = np.hstack([curves, Curve(loxodrome(R=r-i*step, angle=90, count_of_rot=17,
+                                                    step=steps, point_n=point_n))])
     return curves
+
+def matrix_dot_all(self, array_matrix):
+    T0_2 = array_matrix[0].dot(array_matrix[1])
+    return T0_2
+
+def matrix_create(cja):
+    from numpy import (sin, cos)
+    from DH_config import DH
+    T = np.eye(4, 4)
+    for i, item in enumerate(cja):
+        d = DH[f'displacement_theta_{i + 1}']
+        T = T.dot(
+            [[cos(cja[i] + d), -sin(cja[i] + d) * cos(DH[f'alpha_{i + 1}']),
+              sin(cja[i] + d) * sin(DH[f'alpha_{i + 1}']),
+              DH[f'a_{i + 1}'] * cos(cja[i] + d)],
+             [sin(cja[i] + d), cos(cja[i] + d) * cos(DH[f'alpha_{i + 1}']),
+              -cos(cja[i] + d) * sin(DH[f'alpha_{i + 1}']),
+              DH[f'a_{i + 1}'] * sin(cja[i] + d)],
+             [0, sin(DH[f'alpha_{i + 1}']), cos(DH[f'alpha_{i + 1}']), DH[f'd_{i + 1}']],
+             [0, 0, 0, 1]])
+    return np.array(T)
+
+def show_ijk(ax, matrix: ndarray[4, 4]):
+    ijk = np.array([[1, 0, 0, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 1, 0],
+                     [0, 0, 0, 1]])
+    rotate = ijk.dot(matrix)
+    n = rotate[0:3, 3]
+    ax.text(n[0], n[1], n[2], f"{n[0], n[1], n[2]}", color='red')
+    colors = ['#fa0707', '#25c710', '#132ceb']
+    for i, vector in enumerate(rotate):
+        if i == 3:
+            break
+        ax.quiver(n[0], n[1], n[2], vector[0], vector[1], vector[2], color=colors[i])
+def angles_from_vector(curve):
+    alpha = np.arctan2(curve[7], curve[6])
+    beta = np.arctan2(curve[4], curve[5])
+    return alpha, beta
+
+    
 
 def trajectory_generate(h=10, line_width=1, point_n=np.array([0, 0, 0])):
     v = np.array([])
@@ -516,25 +559,70 @@ def line_segments_array_create_from_points(points):
     return arr
 
 def trajectories_intersection_create(polygon, trajectories):
-    points = np.array([0, 0, 0])
+    segments = np.array([])
     for i, item in enumerate(trajectories):
+        p1 = np.array([])
         for segment in polygon.get_line_segments():
             p = point_from_segment_segment_intersection(item, segment)
             if isinstance(p, ndarray):
-                logger.debug(p)
-                points = np.vstack([points, p])
-    points = points[1:np.shape(points)[0]]
-    return points
+                if np.shape(p1) == (0,):
+                    p1 = np.hstack([p1, p])
+                else:
+                    p1 = np.vstack([p1, p])
+        print(p1)
+        if not np.shape(p1) == (3,):
+            # p1 = p1[1:np.shape(points)[0]]
+            if p1.shape == (2,3):
+                s = Line_segment(point1=p1[0], point2=p1[1])
+                s.color = 'red'
+                s.linewidth = 6
+                segments = np.hstack([segments, s])
 
+
+
+    # points = points[1:np.shape(points)[0]]
+    return segments
+
+# def angles_from_vector(vector: np.ndarray)
+
+def cut_curve(points: ndarray, path):
+    import trimesh
+    from curve import Curve5xs, Curve5x, Curve
+    your_mesh = trimesh.load_mesh(path)
+    arr = np.array([])
+    var_mem = False
+    for i, point in enumerate(points):
+        var = your_mesh.contains([point])
+        if var and var_mem:
+            arr[-1].union(point)
+        elif var and not var_mem:
+            new_curve = Curve()
+            new_curve.union(point)
+            arr = np.hstack([arr, new_curve])
+        var_mem = var
+    return arr
+
+def angles(curves5x):
+    for curve in curves5x:
+        curve.curve_array
 
 class Points:
-    def __init__(self, xyz: np.ndarray[:, 3], color='green', s=10, marker='o'):
+    def __init__(self, xyz: np.ndarray[:, 3], color='green', s=1, marker='o', method='scatter', text=False):
+        self.text = text
+        self.method = method
         self.xyz = np.array(xyz)
         self.color = color
         self.s = s
         self.marker = marker
 
     def show(self, ax):
-        xyz_T = self.xyz.T
-        ax.scatter(xyz_T[0], xyz_T[1], xyz_T[2], color=self.color, s=self.s, marker=self.marker)
+        # if annotate:
+        #     ax.text(self.xyz[0], self.xyz[1], self.xyz[2], f'{np.round(self.xyz[0], 4)}, {np.round(self.xyz[1], 4)}, {np.round(self.xyz[2], 4)}')
+        if self.method == 'plot':
+            ax.plot(self.xyz.T[0], self.xyz.T[1], self.xyz.T[2], color=self.color)
+        elif self.method == 'scatter':
+            ax.scatter(self.xyz.T[0], self.xyz.T[1], self.xyz.T[2], color=self.color, s=self.s, marker=self.marker)
+        if self.text:
+            for point in self.xyz:
+                ax.text(point[0], point[1], point[2], f"center point: \n {point[0], point[1], point[2]}", color='blue')
 
