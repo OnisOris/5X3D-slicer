@@ -1,6 +1,4 @@
-from threeDTool import *
-from line import Line
-from plane import Plane
+from ThreeDTool import Plane, Line
 
 plane1 = Plane(0, 0, 1, 0)
 plane2 = Plane(1, 0, 0, 0)
