@@ -1,16 +1,10 @@
-from polyhedron import Polyhedron
-import numpy as np
-from line import Line
-from parser_stl import *
-from plane import Triangle
-from loguru import logger
+from ThreeDTool import Polyhedron, Parser_stl, Triangle, Dspl, loxodrome
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from threeDTool import *
-from display import Dspl
+import numpy as np
 mpl.use('Qt5Agg')
 
-path = "C:/Users\mixai\OneDrive - ITMO UNIVERSITY\code/5X3D-slicer/test_models/MeshBody1_sphere.stl"
+path = "/tests/test_functions/test_models/MeshBody1_sphere.stl"
 
 file = open(path, "r")
 parser = Parser_stl()
@@ -25,9 +19,6 @@ dp.show()
 
 polyhedron = Polyhedron(tr)
 
-# point = np.array([-1, -0.7777777777777778, -0.33333333333333337])
-# print(polyhedron.point_analyze(point))
-
 arr0 = loxodrome(angle=90, R=1, count_of_rot=17, step=0.0025)
 arr_T = arr0.T
 
@@ -40,16 +31,13 @@ k = np.shape(arr0)[0]
 arr = np.array([0, 0, 0])
 for i, point in enumerate(arr0):
     var = polyhedron.point_analyze(point)
-    logger.debug(f"Итерация {i}, из {k},{var}")
     if var:
         arr = np.vstack([arr, point])
-logger.debug(arr.shape)
 arr = arr[1:np.shape(arr)[0]]
 arr2 = arr.T
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(arr2[0], arr2[1], arr2[2], color='green', s=10, marker='o')
-# ax.plot(arr2[0], arr2[1], arr2[2])
 plt.show()
 

@@ -1,10 +1,9 @@
-from plane import Polygon_2D
-from threeDTool import *
+# from ThreeDTool.ThreeDTool.plane import Polygon_2D
+from ThreeDTool import *
 import matplotlib.pyplot as plt
 
 vert = np.array([[1, 1], [2, 2], [1, 3], [2, 4], [4, 4], [4, 1]])
 pol = Polygon_2D(vert)
-
 max_x = vert.T[0].max()
 min_x = vert.T[0].min()
 

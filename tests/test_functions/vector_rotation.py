@@ -1,6 +1,4 @@
-from twoDTool import *
-from line import Line
-from threeDTool import perpendicular_line
+from ThreeDTool import *
 
 vector1 = np.array([0.5, 5])
 print(vector_rotation(vector1.T, -90, grad=True))

@@ -1,7 +1,7 @@
-from threeDTool import position_analyze_of_triangle
-from parser_stl import Parser_stl
-from plane import Triangle, Plane
-path = "/test_models/cube.stl"
+from ThreeDTool import position_analyze_of_triangle
+from ThreeDTool import Parser_stl
+from ThreeDTool import Triangle, Plane
+path = "./test_models/cube.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)

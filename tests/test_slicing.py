@@ -1,13 +1,6 @@
-import numpy as np
-from loguru import logger
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from line import Line, Line_segment
-from plane import Plane, Triangle
-from parser_stl import Parser_stl
-from threeDTool import *
+from ThreeDTool import *
 
-path = "../test_models/mainHolder.stl"
+path = "test_functions/test_models/mainHolder.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
@@ -59,8 +52,6 @@ def slicing(triangles, thiсk=0.1):
                     points.append(point3)
         slice_plane.d -= 0.1
     points = np.array(points)
-    # u, idx = np.unique(points, axis=0, return_index=True)
-    # points = u[idx.argsort()]
     logger.debug(points)
     return points.T
 

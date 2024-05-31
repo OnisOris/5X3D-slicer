@@ -1,5 +1,4 @@
-from threeDTool import *
-from line import Line
+from ThreeDTool import *
 
 # line1 = Line(1, 0, 0, 1, 0, 0)
 # line2 = Line(0, 1, 0, 1, 0, 0)

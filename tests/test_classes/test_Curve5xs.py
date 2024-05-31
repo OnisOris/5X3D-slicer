@@ -1,17 +1,13 @@
-import numpy as np
-from loguru import logger
-from mpl_toolkits.mplot3d import axes3d
-import matplotlib.pyplot as plt
-from polyhedron import Polyhedron
-from ThreeDTool.ThreeDTool import ffdj
-from line import Line, Line_segment
-from plane import Plane, Triangle, Polygon
-from parser_stl import Parser_stl
-from threeDTool import *
-from display import Dspl
-import ThreeDTool
+from ThreeDTool.polyhedron import Polyhedron
+from ThreeDTool.triangle import Triangle
+from ThreeDTool.parser_stl import Parser_stl
+from ThreeDTool.threeDTool import *
+from ThreeDTool.display import Dspl
 import trimesh
-from curve import *
+from ThreeDTool.curve import *
+from ThreeDTool.points import Points
+import matplotlib as mpl
+mpl.use('Qt5Agg')
 
 def loxo_create(arr0, path):
     your_mesh = trimesh.load_mesh(path)
@@ -32,7 +28,7 @@ def loxo_create(arr0, path):
     # np.save('arr_not', arr_not)
     return arr
 
-path = "C:/Users\mixai\OneDrive - ITMO UNIVERSITY\code/5X3D-slicer/test_models/cube.stl"
+path = "/tests/test_functions/test_models/cube.stl"
 
 file = open(path, "r")
 parser = Parser_stl()

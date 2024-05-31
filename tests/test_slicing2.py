@@ -1,17 +1,8 @@
-import numpy as np
-from loguru import logger
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from line import Line, Line_segment
-from plane import Plane, Triangle
-from parser_stl import Parser_stl
-from threeDTool import *
+from ThreeDTool import *
 import matplotlib as mpl
-# mpl.use('TkAgg')
 
 mpl.use('Qt5Agg')
-
-path = "C:/Users\mixai\OneDrive - ITMO UNIVERSITY\code/5X3D-slicer/test_models/cube.stl"
+path = "./test_functions/test_models/cube.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
@@ -72,9 +63,6 @@ points = slicing(triangles)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(points[0], points[1], points[2])
-# plt.xlabel("x")
-# plt.ylabel("y")
-# plt.zlabel("y")
 ax.set_xlabel('X Label')
 ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')

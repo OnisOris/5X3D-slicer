@@ -1,9 +1,8 @@
-from surface import Sphere
+from ThreeDTool.surface import Sphere
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import numpy as np
 from loguru import logger
-# mpl.use('TkAgg')
+import matplotlib as mpl
 mpl.use('Qt5Agg')
 
 a = 0

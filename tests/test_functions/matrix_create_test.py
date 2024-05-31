@@ -1,9 +1,10 @@
-from threeDTool import *
+from ThreeDTool import *
 from loguru import logger
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from DH_config import *
 mpl.use('Qt5Agg')
-matrixes = matrix_create([0, np.pi/3])
+matrixes = matrix_create([0, np.pi/3], DH)
 print(matrixes)
 
 first_m = np.array([[1, 0, 0, 0],

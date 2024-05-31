@@ -1,4 +1,4 @@
-from twoDTool import angle_from_vectors_2d, opposite_vectors
+from ThreeDTool import angle_from_vectors_2d
 import numpy as np
 v1 = [0, 4]
 v2 = [1, 0]

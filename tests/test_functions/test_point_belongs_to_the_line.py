@@ -1,4 +1,4 @@
-from line import Line
+from ThreeDTool import Line
 import numpy as np
 
 line = Line()
