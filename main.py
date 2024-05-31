@@ -20,7 +20,7 @@ def loxo_create(arr0, path):
     arr2 = arr.T
     return arr
 
-path = "/tests/test_functions/test_models/cube.stl"
+path = "./tests/test_functions/test_models/cube.stl"
 
 file = open(path, "r")
 parser = Parser_stl()
