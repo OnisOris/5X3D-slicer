@@ -1,8 +1,6 @@
-from ThreeDTool.threeDTool import *
-from ThreeDTool.display import Dspl
+from ThreeDTool import generate_loxodromes, Dspl
 import matplotlib as mpl
 mpl.use('Qt5Agg')
-lox = generate_loxodromes(r=10)
-logger.debug(lox[0][0])
+lox = generate_loxodromes(r=10, layer_height=1)
 dspl = Dspl(lox)
 dspl.show()
