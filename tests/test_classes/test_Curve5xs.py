@@ -1,34 +1,9 @@
-from ThreeDTool.polyhedron import Polyhedron
-from ThreeDTool.triangle import Triangle
-from ThreeDTool.parser_stl import Parser_stl
-from ThreeDTool.threeDTool import *
-from ThreeDTool.display import Dspl
 import trimesh
-from ThreeDTool.curve import *
-from ThreeDTool.points import Points
+from ThreeDTool import *
 import matplotlib as mpl
 mpl.use('Qt5Agg')
 
-def loxo_create(arr0, path):
-    your_mesh = trimesh.load_mesh(path)
-    k = np.shape(arr0)[0]
-    arr = np.array([0, 0, 0])
-    arr_not = np.array([0, 0, 0])
-    for i, point in enumerate(arr0):
-        var = your_mesh.contains([point])
-        # logger.debug(f"Итерация {i}, из {k},{var}")
-        if var:
-            arr = np.vstack([arr, point])
-        else:
-            arr_not = np.vstack([arr_not, point])
-    # logger.debug(arr.shape)
-    arr = arr[1:np.shape(arr)[0]]
-    arr_not = arr_not[1:np.shape(arr_not)[0]]
-    arr2 = arr.T
-    # np.save('arr_not', arr_not)
-    return arr
-
-path = "/tests/test_functions/test_models/cube.stl"
+path = "../../tests/test_functions/test_models/cube.stl"
 
 file = open(path, "r")
 parser = Parser_stl()
@@ -39,8 +14,6 @@ tr = np.array([])
 for item in triangles:
     tr = np.hstack([tr, Triangle(item)])
 
-# dp.show()
-
 polyhedron = Polyhedron(tr)
 
 # вычисление радиуса
@@ -50,10 +23,6 @@ point_n = polyhedron.get_median_point() - [0, 0.5, 0.5]
 arr = generate_loxodromes(r=rmax, point_n=point_n, steps=0.001)
 
 cc = cut_curve(arr[2], path)
-# logger.debug(cc)
-
-# dp = Dspl(cc)
-# dp.show()
 
 center_point = point_n
 center_p = Points([center_point], s=50, color='green', text=True)
