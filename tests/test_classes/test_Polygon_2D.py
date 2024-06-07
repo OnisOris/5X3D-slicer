@@ -14,7 +14,7 @@ ax.quiver(point[0], point[1], V[0], V[1], angles='xy', scale_units='xy', scale=1
 plt.scatter(pol.barycenter[0], pol.barycenter[1], color='orange', s=40, marker='o')
 for item in pol.point_of_intersection(point):
     plt.scatter(item[0], item[1], color='green', s=40, marker='o')
-plt.plot(pol.get_closed_vartices().T[0], pol.get_closed_vartices().T[1])
+plt.plot(pol.get_closed_vertices().T[0], pol.get_closed_vertices().T[1])
 plt.legend(('Вектор луча', 'Барицентр', 'Точка(и) пересечения луча с фигурой'))
 plt.title("")
 plt.xlabel("x")
