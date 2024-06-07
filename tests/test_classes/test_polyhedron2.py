@@ -4,8 +4,7 @@ import matplotlib as mpl
 import numpy as np
 mpl.use('Qt5Agg')
 
-path = "/tests/test_functions/test_models/MeshBody1_sphere.stl"
-
+path = "../../tests/test_functions/test_models/MeshBody1_sphere.stl"
 file = open(path, "r")
 parser = Parser_stl()
 triangles, name = parser.parse_stl(file)
