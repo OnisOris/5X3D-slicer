@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 mpl.use('Qt5Agg')
 
-path = "/tests/test_functions/test_models\cube.stl"
+path = "../../tests/test_functions/test_models/cube.stl"
 
 file = open(path, "r")
 parser = Parser_stl()
